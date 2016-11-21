@@ -21,6 +21,7 @@
         android:textStyle="bold" /> -->
     <RelativeLayout
         android:id="@+id/spenViewLayout"
+        android:keepScreenOn="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     </RelativeLayout>
