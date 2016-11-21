@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#0099cc"
+    android:orientation="vertical"
     tools:context="com.example.pie.hellospen.FullscreenActivity">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
@@ -22,6 +23,7 @@
     <RelativeLayout
         android:id="@+id/spenViewLayout"
         android:keepScreenOn="true"
+
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     </RelativeLayout>

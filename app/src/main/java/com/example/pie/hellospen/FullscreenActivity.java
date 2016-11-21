@@ -13,6 +13,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Display;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -24,7 +27,9 @@ import com.samsung.android.sdk.pen.Spen;
 import com.samsung.android.sdk.pen.SpenSettingPenInfo;
 import com.samsung.android.sdk.pen.document.SpenNoteDoc;
 import com.samsung.android.sdk.pen.document.SpenPageDoc;
+import com.samsung.android.sdk.pen.engine.SpenLongPressListener;
 import com.samsung.android.sdk.pen.engine.SpenSimpleSurfaceView;
+import com.samsung.android.sdk.pen.engine.SpenTouchListener;
 
 import java.io.IOException;
 
@@ -51,7 +56,7 @@ public class FullscreenActivity extends AppCompatActivity {
      */
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
-    private View mContentView;
+    //private View mContentView;
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
         @Override
@@ -67,6 +72,12 @@ public class FullscreenActivity extends AppCompatActivity {
                     | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                     | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);*/
+            mSpenSimpleSurfaceView.setSystemUiVisibility ( View.SYSTEM_UI_FLAG_LOW_PROFILE
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION );
         }
     };
     private View mControlsView;
@@ -81,6 +92,7 @@ public class FullscreenActivity extends AppCompatActivity {
             mControlsView.setVisibility(View.VISIBLE);
         }
     };
+
     private boolean mVisible;
     private final Runnable mHideRunnable = new Runnable() {
         @Override
@@ -107,7 +119,30 @@ public class FullscreenActivity extends AppCompatActivity {
     private SpenNoteDoc mSpenNoteDoc;
     private SpenPageDoc mSpenPageDoc;
     private SpenSimpleSurfaceView mSpenSimpleSurfaceView;
-    private Button saveButton ;
+    //**private Button saveButton ;
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_layout, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.save_exit_item:
+                //saveNoteFile( );
+                return true;
+            /*
+            case R.id.help:
+                showHelp();
+                return true;
+                */
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -207,20 +242,13 @@ public class FullscreenActivity extends AppCompatActivity {
         mSpenSimpleSurfaceView.setPenSettingInfo ( penInfo );
 
         //**Full Screen
-        mSpenSimpleSurfaceView.setSystemUiVisibility ( View.SYSTEM_UI_FLAG_LOW_PROFILE
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION );
-
-        /*
-        mSpenSimpleSurfaceView.setOnClickListener ( new View.OnClickListener () {
-            public void onClick(View view) {
-                toggle ();
+        mSpenSimpleSurfaceView.setLongPressListener ( new SpenLongPressListener () {
+            @Override
+            public void onLongPressed ( MotionEvent motionEvent ) {
+                toggle( ) ;
             }
         } );
-        */
+
     }
 
     @Override
@@ -258,7 +286,7 @@ public class FullscreenActivity extends AppCompatActivity {
     @SuppressLint("InlinedApi")
     private void show() {
         // Show the system bar
-        mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        mSpenSimpleSurfaceView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         mVisible = true;
 
