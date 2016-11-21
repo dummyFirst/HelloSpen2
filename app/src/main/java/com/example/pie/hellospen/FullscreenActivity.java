@@ -26,13 +26,17 @@ import android.widget.Toast;
 import com.samsung.android.sdk.SsdkUnsupportedException;
 import com.samsung.android.sdk.pen.Spen;
 import com.samsung.android.sdk.pen.SpenSettingPenInfo;
+import com.samsung.android.sdk.pen.document.SpenInvalidPasswordException;
 import com.samsung.android.sdk.pen.document.SpenNoteDoc;
 import com.samsung.android.sdk.pen.document.SpenPageDoc;
+import com.samsung.android.sdk.pen.document.SpenUnsupportedTypeException;
+import com.samsung.android.sdk.pen.document.SpenUnsupportedVersionException;
 import com.samsung.android.sdk.pen.engine.SpenLongPressListener;
 import com.samsung.android.sdk.pen.engine.SpenSimpleSurfaceView;
 import com.samsung.android.sdk.pen.engine.SpenTouchListener;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -124,6 +128,9 @@ public class FullscreenActivity extends AppCompatActivity {
     private SpenPageDoc mSpenPageDoc;
     private SpenSimpleSurfaceView mSpenSimpleSurfaceView;
     //**private Button saveButton ;
+    
+    File _dir ;
+    Rect _screenRect ;
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -138,11 +145,11 @@ public class FullscreenActivity extends AppCompatActivity {
             case R.id.save_exit_item:
                 saveNoteFile( );
                 return true;
-            /*
-            case R.id.help:
-                showHelp();
+            
+            case R.id.load_item:
+                loadNoteFile() ;
                 return true;
-                */
+                
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -207,12 +214,12 @@ public class FullscreenActivity extends AppCompatActivity {
 
         // Get the dimension of the device screen.
         Display display = getWindowManager ().getDefaultDisplay ();
-        Rect rect = new Rect ();
-        display.getRectSize ( rect );
+        _screenRect = new Rect ();
+        display.getRectSize ( _screenRect );
         // Create SpenNoteDoc
         try {
             mSpenNoteDoc =
-                    new SpenNoteDoc ( mContext, rect.width (), rect.height () );
+                    new SpenNoteDoc ( mContext, _screenRect.width (), _screenRect.height () );
         } catch ( IOException e ) {
             Toast.makeText ( mContext, "Cannot create new NoteDoc.",
                     Toast.LENGTH_SHORT ).show ();
@@ -253,6 +260,15 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         } );
 
+        // Set the save directory for the file.
+        _dir = new File ( Environment.getExternalStorageDirectory ().getAbsolutePath () + "/SPen/" );
+        if (!_dir.exists()) {
+            if (!_dir.mkdirs()) {
+                Toast.makeText(mContext, "Save Path Creation Error", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
     }
 
     private void saveNoteFile() {
@@ -269,16 +285,8 @@ public class FullscreenActivity extends AppCompatActivity {
         label += "_" + Integer.toString ( hh ) + "_" + Integer.toString ( mm ) +
                 "_" + Integer.toString ( miliSec );
         label += ".spd";
-
-        // Set the save directory for the file.
-        File dir = new File ( Environment.getExternalStorageDirectory ().getAbsolutePath () + "/SPen/" );
-        if (!dir.exists()) {
-            if (!dir.mkdirs()) {
-                Toast.makeText(mContext, "Save Path Creation Error", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        }
-        String fileName = dir.getPath () + "/" + label;
+        
+        String fileName = _dir + "/" + label;
         try {
             // Save NoteDoc
             mSpenNoteDoc.save( fileName, false);
@@ -457,4 +465,78 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     }
 
+    private void loadNoteFile() {
+        // Load the file list.
+        final String fileList[] = setFileList();
+        if (fileList == null) {
+            return;
+        }
+
+        // Prompt Load File dialog.
+        new AlertDialog.Builder(mContext).setTitle("Select file")
+                .setItems(fileList, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String strFilePath = _dir.getPath() + '/' + fileList[which];
+
+                        try {
+                            // Create NoteDoc with the selected file.
+                            SpenNoteDoc tmpSpenNoteDoc = new SpenNoteDoc(mContext, strFilePath, _screenRect.width(),
+                                    SpenNoteDoc.MODE_WRITABLE, true);
+                            mSpenNoteDoc.close();
+                            mSpenNoteDoc = tmpSpenNoteDoc;
+                            if (mSpenNoteDoc.getPageCount() == 0) {
+                                mSpenPageDoc = mSpenNoteDoc.appendPage();
+                            } else {
+                                mSpenPageDoc = mSpenNoteDoc.getPage(mSpenNoteDoc.getLastEditedPageIndex());
+                            }
+                            mSpenSimpleSurfaceView.setPageDoc(mSpenPageDoc, true);
+                            mSpenSimpleSurfaceView.update();
+                            Toast.makeText(mContext, "Successfully loaded noteFile.", Toast.LENGTH_SHORT).show();
+                        } catch (IOException e) {
+                            Toast.makeText(mContext, "Cannot open this file.", Toast.LENGTH_LONG).show();
+                        } catch (SpenUnsupportedTypeException e) {
+                            Toast.makeText(mContext, "This file is not supported.", Toast.LENGTH_LONG).show();
+                        } catch (SpenInvalidPasswordException e) {
+                            Toast.makeText(mContext, "This file is locked by a password.", Toast.LENGTH_LONG).show();
+                        } catch (SpenUnsupportedVersionException e) {
+                            Toast.makeText(mContext, "This file is the version that does not support.",
+                                    Toast.LENGTH_LONG).show();
+                        } catch (Exception e) {
+                            Toast.makeText(mContext, "Failed to load noteDoc.", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }).show();
+    }
+
+    private String[] setFileList() {
+        // Call the file list under the directory in _dir.
+        if (!_dir.exists()) {
+            if (!_dir.mkdirs()) {
+                Toast.makeText(mContext, "Save Path Creation Error", Toast.LENGTH_SHORT).show();
+                return null;
+            }
+        }
+        // Filter in spd and png files.
+        File[] fileList = _dir.listFiles(new txtFileFilter());
+        if (fileList == null) {
+            Toast.makeText(mContext, "File does not exist.", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+        int i = 0;
+        String[] strFileList = new String[fileList.length];
+        for (File file : fileList) {
+            strFileList[i++] = file.getName();
+        }
+
+        return strFileList;
+    }
+
+    static class txtFileFilter implements FilenameFilter {
+        @Override
+        public boolean accept(File dir, String name) {
+            return (name.endsWith(".spd") || name.endsWith(".png"));
+        }
+    }
 }
