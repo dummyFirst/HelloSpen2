@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.os.Environment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -31,7 +32,10 @@ import com.samsung.android.sdk.pen.engine.SpenLongPressListener;
 import com.samsung.android.sdk.pen.engine.SpenSimpleSurfaceView;
 import com.samsung.android.sdk.pen.engine.SpenTouchListener;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -132,7 +136,7 @@ public class FullscreenActivity extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.save_exit_item:
-                //saveNoteFile( );
+                saveNoteFile( );
                 return true;
             /*
             case R.id.help:
@@ -249,6 +253,50 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         } );
 
+    }
+
+    private void saveNoteFile() {
+        //**get the date, time for file name.
+        String label = "" ;
+        Calendar calendar = new GregorianCalendar(  );
+        int yy = calendar.get ( Calendar.YEAR );
+        int mo = calendar.get ( Calendar.MONTH ) + 1;
+        int dd = calendar.get ( Calendar.DAY_OF_MONTH );
+        int hh = calendar.get ( Calendar.HOUR );
+        int mm = calendar.get ( Calendar.MINUTE );
+        int miliSec = calendar.get ( Calendar.MILLISECOND );
+        label = Integer.toString ( yy ) + "-" + Integer.toString ( mo ) + "-" + Integer.toString ( dd );
+        label += "_" + Integer.toString ( hh ) + "_" + Integer.toString ( mm ) +
+                "_" + Integer.toString ( miliSec );
+        label += ".spd";
+
+        // Set the save directory for the file.
+        File dir = new File ( Environment.getExternalStorageDirectory ().getAbsolutePath () + "/SPen/" );
+        if (!dir.exists()) {
+            if (!dir.mkdirs()) {
+                Toast.makeText(mContext, "Save Path Creation Error", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+        String fileName = dir.getPath () + "/" + label;
+        try {
+            // Save NoteDoc
+            mSpenNoteDoc.save( fileName, false);
+            Toast.makeText(mContext, "Save success to " + fileName, Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            Toast.makeText(mContext, "Cannot save NoteDoc file.", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+            return ;
+            //return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ;
+            //return false;
+        }
+
+        //**Clear the view.
+        mSpenPageDoc.removeAllObject();
+        mSpenSimpleSurfaceView.update();
     }
 
     @Override
