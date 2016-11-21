@@ -129,6 +129,11 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         });
         */
+        mSpenSimpleSurfaceView.setOnClickListener ( new View.OnClickListener () {
+            public void onClick(View view) {
+                toggle ();
+            }
+        } );
 
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
