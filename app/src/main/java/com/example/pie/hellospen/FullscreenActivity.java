@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
@@ -56,7 +57,7 @@ public class FullscreenActivity extends AppCompatActivity {
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
      * user interaction before hiding the system UI.
      */
-    private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
+    private static final int AUTO_HIDE_DELAY_MILLIS = 2000;
 
     /**
      * Some older devices needs a small delay between UI widget updates
@@ -127,10 +128,11 @@ public class FullscreenActivity extends AppCompatActivity {
     private SpenNoteDoc mSpenNoteDoc;
     private SpenPageDoc mSpenPageDoc;
     private SpenSimpleSurfaceView mSpenSimpleSurfaceView;
+    private int _tooltype ;
     //**private Button saveButton ;
     
-    File _dir ;
-    Rect _screenRect ;
+    private File _dir ;
+    private Rect _screenRect ;
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -180,7 +182,17 @@ public class FullscreenActivity extends AppCompatActivity {
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
-        findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+        //findViewById(R.id.edit_button).setOnTouchListener(mDelayHideTouchListener);
+        //**
+        findViewById(R.id.edit_button).setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        hide() ;
+                        mSpenSimpleSurfaceView.setToolTypeAction(_tooltype,
+                                SpenSimpleSurfaceView.ACTION_STROKE);
+                    }
+                });
 
         mContext = this;
 
@@ -190,8 +202,10 @@ public class FullscreenActivity extends AppCompatActivity {
         try {
             spenPackage.initialize ( this );
             isSpenFeatureEnabled = spenPackage.isFeatureEnabled ( Spen.DEVICE_PEN );
+            //**
+            _tooltype = SpenSimpleSurfaceView.TOOL_SPEN ;
         } catch ( SsdkUnsupportedException e ) {
-            if ( processUnsupportedException ( e ) == true ) {
+            if ( Utils.processUnsupportedException ( this, e ) == true ) {
                 return;
             }
         } catch ( Exception e1 ) {
@@ -241,15 +255,20 @@ public class FullscreenActivity extends AppCompatActivity {
         mSpenSimpleSurfaceView.setPageDoc ( mSpenPageDoc, true );
 
         if ( isSpenFeatureEnabled == false ) {
-            mSpenSimpleSurfaceView.setToolTypeAction ( SpenSimpleSurfaceView.TOOL_FINGER, SpenSimpleSurfaceView.ACTION_STROKE );
+            //**
+            _tooltype = SpenSimpleSurfaceView.TOOL_FINGER ;
+            mSpenSimpleSurfaceView.setToolTypeAction ( _tooltype, SpenSimpleSurfaceView.ACTION_STROKE );
             Toast.makeText ( mContext,
                     "Device does not support Spen. \n You can draw stroke by finger.",
                     Toast.LENGTH_SHORT ).show ();
         }
 
-        //**Change the pen color to blue.
+
+
+        //**Change the pen info.
         SpenSettingPenInfo penInfo = new SpenSettingPenInfo ();
-        penInfo.color = Color.BLUE;
+        penInfo.color = Color.BLACK;
+        penInfo.size = 10 ;
         mSpenSimpleSurfaceView.setPenSettingInfo ( penInfo );
 
         //**Full Screen
@@ -360,92 +379,9 @@ public class FullscreenActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
-    private boolean processUnsupportedException(SsdkUnsupportedException e) {
 
-        e.printStackTrace();
-        int errType = e.getType();
-        // If the device is not a Samsung device or if the device does not support Pen.
-        if (errType == SsdkUnsupportedException.VENDOR_NOT_SUPPORTED
-                || errType == SsdkUnsupportedException.DEVICE_NOT_SUPPORTED) {
-            Toast.makeText(mContext, "This device does not support Spen.",
-                    Toast.LENGTH_SHORT).show();
-            finish();
-        }
-        else if (errType == SsdkUnsupportedException.LIBRARY_NOT_INSTALLED) {
-            // If SpenSDK APK is not installed.
-            showAlertDialog( "You need to install additional Spen software"
-                            +" to use this application."
-                            + "You will be taken to the installation screen."
-                            + "Restart this application after the software has been installed."
-                    , true);
-        } else if (errType
-                == SsdkUnsupportedException.LIBRARY_UPDATE_IS_REQUIRED) {
-            // SpenSDK APK must be updated.
-            showAlertDialog( "You need to update your Spen software "
-                            + "to use this application."
-                            + " You will be taken to the installation screen."
-                            + " Restart this application after the software has been updated."
-                    , true);
-        } else if (errType
-                == SsdkUnsupportedException.LIBRARY_UPDATE_IS_RECOMMENDED) {
-            // Update of SpenSDK APK to an available new version is recommended.
-            showAlertDialog( "We recommend that you update your Spen software"
-                            +" before using this application."
-                            + " You will be taken to the installation screen."
-                            + " Restart this application after the software has been updated."
-                    , false);
-            return false;
-        }
-        return true;
-    }
 
-    private void showAlertDialog(String msg, final boolean closeActivity) {
 
-        AlertDialog.Builder dlg = new AlertDialog.Builder(mContext);
-        dlg.setIcon(getResources().getDrawable(
-                android.R.drawable.ic_dialog_alert));
-        dlg.setTitle("Upgrade Notification")
-                .setMessage(msg)
-                .setPositiveButton(android.R.string.yes,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(
-                                    DialogInterface dialog, int which) {
-                                // Go to the market website and install/update APK.
-                                Uri uri = Uri.parse("market://details?id=" + Spen.getSpenPackageName());
-                                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                                        | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(intent);
-
-                                dialog.dismiss();
-                                finish();
-                            }
-                        })
-                .setNegativeButton(android.R.string.no,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(
-                                    DialogInterface dialog, int which) {
-                                if(closeActivity == true) {
-                                    // Terminate the activity if APK is not installed.
-                                    finish();
-                                }
-                                dialog.dismiss();
-                            }
-                        })
-                .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        if(closeActivity == true) {
-                            // Terminate the activity if APK is not installed.
-                            finish();
-                        }
-                    }
-                })
-                .show();
-        dlg = null;
-    }
     @Override
     protected void onDestroy() {
         super.onDestroy ();
@@ -492,6 +428,10 @@ public class FullscreenActivity extends AppCompatActivity {
                             }
                             mSpenSimpleSurfaceView.setPageDoc(mSpenPageDoc, true);
                             mSpenSimpleSurfaceView.update();
+                            //**Disable Spen action.
+                            mSpenSimpleSurfaceView.setToolTypeAction( _tooltype, SpenSimpleSurfaceView.ACTION_NONE );
+                            delayedHide(AUTO_HIDE_DELAY_MILLIS);
+                            mSpenSimpleSurfaceView.setZoomable(false);
                             Toast.makeText(mContext, "Successfully loaded noteFile.", Toast.LENGTH_SHORT).show();
                         } catch (IOException e) {
                             Toast.makeText(mContext, "Cannot open this file.", Toast.LENGTH_LONG).show();
