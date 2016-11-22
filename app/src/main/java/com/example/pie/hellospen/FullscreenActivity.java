@@ -120,6 +120,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private SpenPageDoc mSpenPageDoc;
     private SpenSimpleSurfaceView mSpenSimpleSurfaceView;
     //**private Button saveButton ;
+    boolean _isSpenFeatureEnabled ;
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -174,11 +175,11 @@ public class FullscreenActivity extends AppCompatActivity {
         mContext = this;
 
         // Initialize Spen
-        boolean isSpenFeatureEnabled = false;
+        _isSpenFeatureEnabled = false;
         Spen spenPackage = new Spen ();
         try {
             spenPackage.initialize ( this );
-            isSpenFeatureEnabled = spenPackage.isFeatureEnabled ( Spen.DEVICE_PEN );
+            _isSpenFeatureEnabled = spenPackage.isFeatureEnabled ( Spen.DEVICE_PEN );
         } catch ( SsdkUnsupportedException e ) {
             if ( processUnsupportedException ( e ) == true ) {
                 return;
@@ -229,7 +230,7 @@ public class FullscreenActivity extends AppCompatActivity {
         // Set PageDoc to View.
         mSpenSimpleSurfaceView.setPageDoc ( mSpenPageDoc, true );
 
-        if ( isSpenFeatureEnabled == false ) {
+        if ( _isSpenFeatureEnabled == false ) {
             mSpenSimpleSurfaceView.setToolTypeAction ( SpenSimpleSurfaceView.TOOL_FINGER, SpenSimpleSurfaceView.ACTION_STROKE );
             Toast.makeText ( mContext,
                     "Device does not support Spen. \n You can draw stroke by finger.",
@@ -241,13 +242,24 @@ public class FullscreenActivity extends AppCompatActivity {
         penInfo.color = Color.BLUE;
         mSpenSimpleSurfaceView.setPenSettingInfo ( penInfo );
 
-        //**Full Screen
+        //**toggle Full Screen
         mSpenSimpleSurfaceView.setLongPressListener ( new SpenLongPressListener () {
             @Override
             public void onLongPressed ( MotionEvent motionEvent ) {
-                toggle( ) ;
+                /*
+                int action = mSpenSimpleSurfaceView.getToolTypeAction ( SpenSimpleSurfaceView.TOOL_SPEN ) ;
+                int event = motionEvent.getSource () ;
+                if( _isSpenFeatureEnabled == true &&
+                        action == SpenSimpleSurfaceView.ACTION_STROKE &&
+                        event != MotionEvent.TOOL_TYPE_FINGER ) return ;
+                        */
+                if( motionEvent.getAction ()==MotionEvent.ACTION_DOWN)
+                    toggle( ) ;
             }
         } );
+
+        //**stop Zooming
+        mSpenSimpleSurfaceView.setZoomable ( false );
 
     }
 
