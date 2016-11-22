@@ -124,15 +124,6 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     };
 
-    private Context mContext;
-    private SpenNoteDoc mSpenNoteDoc;
-    private SpenPageDoc mSpenPageDoc;
-    private SpenSimpleSurfaceView mSpenSimpleSurfaceView;
-    private int _tooltype ;
-    //**private Button saveButton ;
-    
-    private File _dir ;
-    private Rect _screenRect ;
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -156,6 +147,37 @@ public class FullscreenActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+
+    private Context mContext;
+    private SpenNoteDoc mSpenNoteDoc;
+    private SpenPageDoc mSpenPageDoc;
+    private SpenSimpleSurfaceView mSpenSimpleSurfaceView;
+
+    private int _tooltype ;
+    //**private Button saveButton ;
+
+    private File _dir ;
+    private File _tempDir ;
+    private Rect _screenRect ;
+
+    private int _mode ;
+    private final int MODE_FIRST_EDIT = 1;
+    private final int MODE_READ = 2;
+    private final int MODE_EDIT = 3;
+
+    private final SpenTouchListener _spenTouchListener = new SpenTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            if( motionEvent.getAction() == MotionEvent.ACTION_UP &&
+                    motionEvent.getToolType(0) == _tooltype &&
+                    (_mode!=MODE_READ) ) {
+
+
+            }
+            return false;
+        }
+    } ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -263,8 +285,7 @@ public class FullscreenActivity extends AppCompatActivity {
                     Toast.LENGTH_SHORT ).show ();
         }
 
-
-
+        mSpenSimpleSurfaceView.setZoomable(false);
         //**Change the pen info.
         SpenSettingPenInfo penInfo = new SpenSettingPenInfo ();
         penInfo.color = Color.BLACK;
@@ -275,15 +296,28 @@ public class FullscreenActivity extends AppCompatActivity {
         mSpenSimpleSurfaceView.setLongPressListener ( new SpenLongPressListener () {
             @Override
             public void onLongPressed ( MotionEvent motionEvent ) {
-                toggle( ) ;
+                if( motionEvent.getToolType(0) == MotionEvent.TOOL_TYPE_FINGER )
+                    toggle( ) ;
             }
         } );
+
+        mSpenSimpleSurfaceView.setTouchListener(_spenTouchListener);
 
         // Set the save directory for the file.
         _dir = new File ( Environment.getExternalStorageDirectory ().getAbsolutePath () + "/SPen/" );
         if (!_dir.exists()) {
             if (!_dir.mkdirs()) {
                 Toast.makeText(mContext, "Save Path Creation Error", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
+        // Set the save temporary directory for the file.
+        _tempDir = new File ( Environment.getExternalStorageDirectory ().getAbsolutePath () + "/SPen/.temp/" );
+        if (!_tempDir.exists()) {
+            if (!_tempDir.mkdirs()) {
+                Toast.makeText(mContext, "Save Temp Path Creation Error",
+                        Toast.LENGTH_SHORT).show();
                 return;
             }
         }
@@ -308,7 +342,7 @@ public class FullscreenActivity extends AppCompatActivity {
         String fileName = _dir + "/" + label;
         try {
             // Save NoteDoc
-            mSpenNoteDoc.save( fileName, false);
+            mSpenNoteDoc.save(fileName, false);
             Toast.makeText(mContext, "Save success to " + fileName, Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             Toast.makeText(mContext, "Cannot save NoteDoc file.", Toast.LENGTH_SHORT).show();
@@ -479,4 +513,5 @@ public class FullscreenActivity extends AppCompatActivity {
             return (name.endsWith(".spd") || name.endsWith(".png"));
         }
     }
-}
+
+}//**End FullscreenActivity
