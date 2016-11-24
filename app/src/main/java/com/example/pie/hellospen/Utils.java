@@ -11,6 +11,9 @@ import android.widget.Toast;
 import com.samsung.android.sdk.SsdkUnsupportedException;
 import com.samsung.android.sdk.pen.Spen;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 /**
  * Created by pie on 16. 11. 22.
  */
@@ -107,4 +110,23 @@ class Utils {
         }
         return true;
     }
+
+    public static String getTimeFileName() {
+        //**get the date, time for file name.
+        String label = "" ;
+        Calendar calendar = new GregorianCalendar (  );
+        int yy = calendar.get ( Calendar.YEAR );
+        int mo = calendar.get ( Calendar.MONTH ) + 1;
+        int dd = calendar.get ( Calendar.DAY_OF_MONTH );
+        int hh = calendar.get ( Calendar.HOUR );
+        int mm = calendar.get ( Calendar.MINUTE );
+        int miliSec = calendar.get ( Calendar.MILLISECOND );
+        label = Integer.toString ( yy ) + "-" + Integer.toString ( mo ) + "-" + Integer.toString ( dd );
+        label += "_" + Integer.toString ( hh ) + "_" + Integer.toString ( mm ) +
+                "_" + Integer.toString ( miliSec );
+        label += ".spd" ;
+
+        return new String(label) ;
+    }
+
 }

@@ -38,8 +38,6 @@ import com.samsung.android.sdk.pen.engine.SpenTouchListener;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 
 /**
@@ -136,7 +134,8 @@ public class FullscreenActivity extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.save_exit_item:
-                saveNoteFile( );
+                String fileName = _dir.getPath () + "/" + Utils.getTimeFileName () ;
+                saveNoteFile( fileName );
                 return true;
             
             case R.id.load_item:
@@ -324,28 +323,14 @@ public class FullscreenActivity extends AppCompatActivity {
 
     }
 
-    private void saveNoteFile() {
-        //**get the date, time for file name.
-        String label = "" ;
-        Calendar calendar = new GregorianCalendar(  );
-        int yy = calendar.get ( Calendar.YEAR );
-        int mo = calendar.get ( Calendar.MONTH ) + 1;
-        int dd = calendar.get ( Calendar.DAY_OF_MONTH );
-        int hh = calendar.get ( Calendar.HOUR );
-        int mm = calendar.get ( Calendar.MINUTE );
-        int miliSec = calendar.get ( Calendar.MILLISECOND );
-        label = Integer.toString ( yy ) + "-" + Integer.toString ( mo ) + "-" + Integer.toString ( dd );
-        label += "_" + Integer.toString ( hh ) + "_" + Integer.toString ( mm ) +
-                "_" + Integer.toString ( miliSec );
-        label += ".spd";
-        
-        String fileName = _dir + "/" + label;
+    private void saveNoteFile(final String fileName) {
         try {
             // Save NoteDoc
             mSpenNoteDoc.save(fileName, false);
             Toast.makeText(mContext, "Save success to " + fileName, Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
-            Toast.makeText(mContext, "Cannot save NoteDoc file.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, "Cannot save NoteDoc file : " + fileName + ".",
+                    Toast.LENGTH_SHORT).show();
             e.printStackTrace();
             return ;
             //return false;
@@ -412,8 +397,6 @@ public class FullscreenActivity extends AppCompatActivity {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
-
-
 
 
     @Override
