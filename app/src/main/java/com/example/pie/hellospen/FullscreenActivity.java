@@ -161,6 +161,8 @@ public class FullscreenActivity extends AppCompatActivity {
     private File _tempDir ;
     private Rect _screenRect ;
 
+    private Button _editButton ;
+
     private int _mode ;
     private final int MODE_FIRST_EDIT = 1;
     private final int MODE_READ = 2;
@@ -195,7 +197,8 @@ public class FullscreenActivity extends AppCompatActivity {
         // while interacting with the UI.
         //findViewById(R.id.edit_button).setOnTouchListener(mDelayHideTouchListener);
         //**
-        findViewById(R.id.edit_button).setOnClickListener(
+        _editButton = (Button)findViewById(R.id.edit_button) ;
+        _editButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -291,6 +294,8 @@ public class FullscreenActivity extends AppCompatActivity {
                     toggle( ) ;
             }
         } );
+
+        _editButton.setEnabled ( false );
 
         // Set the save directory for the file.
         _dir = new File ( Environment.getExternalStorageDirectory ().getAbsolutePath () + "/SPen/" );
