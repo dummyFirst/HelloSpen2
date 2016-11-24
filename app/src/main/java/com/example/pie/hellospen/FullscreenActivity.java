@@ -148,11 +148,11 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     }
 
-
     private Context mContext;
     private SpenNoteDoc mSpenNoteDoc;
     private SpenPageDoc mSpenPageDoc;
-    private SpenSimpleSurfaceView mSpenSimpleSurfaceView;
+    //**private SpenSimpleSurfaceView mSpenSimpleSurfaceView;
+    private UserCanvasView mSpenSimpleSurfaceView;
 
     private int _tooltype ;
     //**private Button saveButton ;
@@ -166,18 +166,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private final int MODE_READ = 2;
     private final int MODE_EDIT = 3;
 
-    private final SpenTouchListener _spenTouchListener = new SpenTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            if( motionEvent.getAction() == MotionEvent.ACTION_UP &&
-                    motionEvent.getToolType(0) == _tooltype &&
-                    (_mode != MODE_READ) ) {
 
-
-            }
-            return false;
-        }
-    } ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -240,7 +229,8 @@ public class FullscreenActivity extends AppCompatActivity {
         // Create Spen View
         RelativeLayout spenViewLayout =
                 ( RelativeLayout ) findViewById ( R.id.spenViewLayout );
-        mSpenSimpleSurfaceView = new SpenSimpleSurfaceView ( mContext );
+        //**
+        mSpenSimpleSurfaceView = new UserCanvasView ( mContext );
         if ( mSpenSimpleSurfaceView == null ) {
             Toast.makeText ( mContext, "Cannot create new SpenView.",
                     Toast.LENGTH_SHORT ).show ();
@@ -252,6 +242,7 @@ public class FullscreenActivity extends AppCompatActivity {
         Display display = getWindowManager ().getDefaultDisplay ();
         _screenRect = new Rect ();
         display.getRectSize ( _screenRect );
+
         // Create SpenNoteDoc
         try {
             mSpenNoteDoc =
@@ -300,8 +291,6 @@ public class FullscreenActivity extends AppCompatActivity {
                     toggle( ) ;
             }
         } );
-
-        mSpenSimpleSurfaceView.setTouchListener(_spenTouchListener);
 
         // Set the save directory for the file.
         _dir = new File ( Environment.getExternalStorageDirectory ().getAbsolutePath () + "/SPen/" );
