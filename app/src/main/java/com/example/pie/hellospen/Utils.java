@@ -11,6 +11,8 @@ import android.widget.Toast;
 import com.samsung.android.sdk.SsdkUnsupportedException;
 import com.samsung.android.sdk.pen.Spen;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -113,12 +115,12 @@ class Utils {
 
     public static String getTimeFileName() {
         //**get the date, time for file name.
-        String label = "" ;
+        String label ;
         Calendar calendar = new GregorianCalendar (  );
         int yy = calendar.get ( Calendar.YEAR );
         int mo = calendar.get ( Calendar.MONTH ) + 1;
         int dd = calendar.get ( Calendar.DAY_OF_MONTH );
-        int hh = calendar.get ( Calendar.HOUR );
+        int hh = calendar.get ( Calendar.HOUR_OF_DAY );
         int mm = calendar.get ( Calendar.MINUTE );
         int miliSec = calendar.get ( Calendar.MILLISECOND );
         label = Integer.toString ( yy ) + "-" + Integer.toString ( mo ) + "-" + Integer.toString ( dd );
@@ -126,7 +128,38 @@ class Utils {
                 "_" + Integer.toString ( miliSec );
         label += ".spd" ;
 
-        return new String(label) ;
+        return label ;
+    }
+
+    public static String[ ] setFileList(File dir, final Context context) {
+        // Call the file list under the directory in dir.
+        if (!dir.exists()) {
+            if (!dir.mkdirs()) {
+                Toast.makeText(context, "Save Path Creation Error", Toast.LENGTH_SHORT).show();
+                return null;
+            }
+        }
+        // Filter in spd and png files.
+        File[] fileList = dir.listFiles ( new TxtFileFilter( ) ) ;
+        if (fileList == null) {
+            Toast.makeText(context, "File does not exist.", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+        int i = 0;
+        String[] strFileList = new String[fileList.length];
+        for (File file : fileList) {
+            strFileList[i++] = file.getName();
+        }
+
+        return strFileList;
+    }
+
+    private static class TxtFileFilter implements FilenameFilter {
+        @Override
+        public boolean accept(File dir, String name) {
+            return (name.endsWith(".spd") || name.endsWith(".png"));
+        }
     }
 
 }

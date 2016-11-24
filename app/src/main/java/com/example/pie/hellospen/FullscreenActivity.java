@@ -1,6 +1,7 @@
 package com.example.pie.hellospen;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -170,7 +171,7 @@ public class FullscreenActivity extends AppCompatActivity {
         public boolean onTouch(View view, MotionEvent motionEvent) {
             if( motionEvent.getAction() == MotionEvent.ACTION_UP &&
                     motionEvent.getToolType(0) == _tooltype &&
-                    (_mode!=MODE_READ) ) {
+                    (_mode != MODE_READ) ) {
 
 
             }
@@ -418,9 +419,9 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     }
 
-    private void loadNoteFile() {
+    private void loadNoteFile( ) {
         // Load the file list.
-        final String fileList[] = setFileList();
+        final String[ ] fileList = Utils.setFileList(_dir, mContext);
         if (fileList == null) {
             return;
         }
@@ -434,7 +435,8 @@ public class FullscreenActivity extends AppCompatActivity {
 
                         try {
                             // Create NoteDoc with the selected file.
-                            SpenNoteDoc tmpSpenNoteDoc = new SpenNoteDoc(mContext, strFilePath, _screenRect.width(),
+                            SpenNoteDoc tmpSpenNoteDoc = new SpenNoteDoc(mContext,
+                                    strFilePath, _screenRect.width(),
                                     SpenNoteDoc.MODE_WRITABLE, true);
                             mSpenNoteDoc.close();
                             mSpenNoteDoc = tmpSpenNoteDoc;
@@ -446,10 +448,12 @@ public class FullscreenActivity extends AppCompatActivity {
                             mSpenSimpleSurfaceView.setPageDoc(mSpenPageDoc, true);
                             mSpenSimpleSurfaceView.update();
                             //**Disable Spen action.
-                            mSpenSimpleSurfaceView.setToolTypeAction( _tooltype, SpenSimpleSurfaceView.ACTION_NONE );
+                            mSpenSimpleSurfaceView.setToolTypeAction( _tooltype,
+                                    SpenSimpleSurfaceView.ACTION_NONE );
                             delayedHide(AUTO_HIDE_DELAY_MILLIS);
                             mSpenSimpleSurfaceView.setZoomable(false);
-                            Toast.makeText(mContext, "Successfully loaded noteFile.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext,
+                                    "Successfully loaded noteFile.", Toast.LENGTH_SHORT).show();
                         } catch (IOException e) {
                             Toast.makeText(mContext, "Cannot open this file.", Toast.LENGTH_LONG).show();
                         } catch (SpenUnsupportedTypeException e) {
@@ -466,35 +470,5 @@ public class FullscreenActivity extends AppCompatActivity {
                 }).show();
     }
 
-    private String[] setFileList() {
-        // Call the file list under the directory in _dir.
-        if (!_dir.exists()) {
-            if (!_dir.mkdirs()) {
-                Toast.makeText(mContext, "Save Path Creation Error", Toast.LENGTH_SHORT).show();
-                return null;
-            }
-        }
-        // Filter in spd and png files.
-        File[] fileList = _dir.listFiles(new txtFileFilter());
-        if (fileList == null) {
-            Toast.makeText(mContext, "File does not exist.", Toast.LENGTH_SHORT).show();
-            return null;
-        }
-
-        int i = 0;
-        String[] strFileList = new String[fileList.length];
-        for (File file : fileList) {
-            strFileList[i++] = file.getName();
-        }
-
-        return strFileList;
-    }
-
-    static class txtFileFilter implements FilenameFilter {
-        @Override
-        public boolean accept(File dir, String name) {
-            return (name.endsWith(".spd") || name.endsWith(".png"));
-        }
-    }
 
 }//**End FullscreenActivity
