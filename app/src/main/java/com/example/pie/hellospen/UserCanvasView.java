@@ -40,6 +40,7 @@ class UserCanvasView extends SpenSimpleSurfaceView {
     private String _curFileName ;
     private File _dir ;
 
+
     public UserCanvasView( Context context ) {
         super( context );
         _context = context ;
@@ -113,7 +114,8 @@ class UserCanvasView extends SpenSimpleSurfaceView {
 
     }
 
-    public void saveNoteFile( final String fileName ) {
+    public void saveNoteFile( ) {
+        final String fileName = _dir.getPath () + "/" + Utils.getTimeFileName () ;
         try {
             // Save NoteDoc
             _noteDoc.save ( fileName, false );
@@ -130,9 +132,11 @@ class UserCanvasView extends SpenSimpleSurfaceView {
             //return false;
         }
 
+        /*
         //**Clear the view.
         _notePage.removeAllObject ();
         update ();
+        */
     }
 
     public void loadNoteFile() {
@@ -169,13 +173,7 @@ class UserCanvasView extends SpenSimpleSurfaceView {
                 _notePage = _noteDoc.getPage ( _noteDoc.getLastEditedPageIndex () );
             }
             setPageDoc ( _notePage, true );
-
-
             update ();
-            //**Disable Spen action.
-            setToolTypeAction ( _tooltype,
-                    SpenSimpleSurfaceView.ACTION_NONE );
-
             setZoomable ( false );
 
             Toast.makeText ( _context,

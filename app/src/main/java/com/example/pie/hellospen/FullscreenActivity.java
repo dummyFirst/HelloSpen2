@@ -119,21 +119,21 @@ public class FullscreenActivity extends AppCompatActivity {
 
     private File _dir;
     private File _tempDir;
-    private Rect _screenRect;
 
     private Button _editButton;
-
-    private boolean _isSpenFeatureEnabled;
 
     private int _editMode;
     private final int MODE_FIRST_EDIT = 1;
     private final int MODE_READ = 2;
     private final int MODE_EDIT = 3;
 
+    private boolean _isSpenFeatureEnabled;
+
+    MenuItem _save_item ;
+
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate ( savedInstanceState );
-
         setContentView ( R.layout.activity_fullscreen );
 
         mVisible = true;
@@ -149,9 +149,8 @@ public class FullscreenActivity extends AppCompatActivity {
                 new View.OnClickListener () {
                     @Override
                     public void onClick( View v ) {
+                        enableEdit ( true );
                         hide ();
-                        _canvasView.setToolTypeAction ( _tooltype,
-                                SpenSimpleSurfaceView.ACTION_STROKE );
                     }
                 } );
 
@@ -281,6 +280,7 @@ public class FullscreenActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu( Menu menu ) {
         MenuInflater inflater = getMenuInflater ();
         inflater.inflate ( R.menu.menu_layout, menu );
+        _save_item = menu.getItem ( 2 ) ;
         return true;
     }
 
@@ -288,22 +288,40 @@ public class FullscreenActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected( MenuItem item ) {
         // Handle item selection
         switch ( item.getItemId () ) {
-            case R.id.save_exit_item:
-                String fileName = _dir.getPath () + "/" + Utils.getTimeFileName ();
-                _canvasView.saveNoteFile ( fileName );
+            case R.id.save_item:
+                _canvasView.saveNoteFile( );
+                enableEdit ( false );
+                delayedHide ( AUTO_HIDE_DELAY_MILLIS );
                 return true;
 
             case R.id.load_item:
                 _canvasView.loadNoteFile( );
-                _editMode = MODE_READ;
-                _editButton.setEnabled ( true );
+                enableEdit ( false );
                 delayedHide ( AUTO_HIDE_DELAY_MILLIS );
-
                 return true;
 
             default:
                 return super.onOptionsItemSelected ( item );
         }
     }
+
+    private void enableEdit( boolean b ) {
+        if(b==true) {
+            _canvasView.setToolTypeAction ( _tooltype,
+                    SpenSimpleSurfaceView.ACTION_STROKE );
+            _editMode = MODE_EDIT;
+            _editButton.setEnabled ( false ) ;
+
+            _save_item.setEnabled ( true ) ;
+        } else {
+            _canvasView.setToolTypeAction ( _tooltype,
+                    SpenSimpleSurfaceView.ACTION_NONE );
+            _editMode = MODE_READ;
+            _editButton.setEnabled ( true ) ;
+
+            _save_item.setEnabled ( false ) ;
+        }
+    }
+
 
 }//**End FullscreenActivity
