@@ -192,19 +192,6 @@ public class FullscreenActivity extends AppCompatActivity {
 
         mVisible = true;
         mControlsView = findViewById( R.id.fullscreen_content_controls );
-        //**mContentView = findViewById(R.id.fullscreen_content);
-
-
-        // Set up the user interaction to manually show or hide the system UI.
-        /*
-        mContentView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggle();
-            }
-        });
-        */
-
 
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
@@ -378,6 +365,11 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     private void loadNoteFile( ) {
+        mSpenNoteDoc = mSpenSimpleSurfaceView.getNoteDoc() ;
+        mSpenPageDoc = mSpenSimpleSurfaceView.getNotePage() ;
+        _screenRect = new Rect( ) ;
+        
+        getWindowManager().getDefaultDisplay().getRectSize( _screenRect );
         // Load the file list.
         final String[] fileList = Utils.setFileList( _dir, mContext );
         if( fileList == null ) {

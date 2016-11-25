@@ -94,5 +94,12 @@ class UserCanvasView extends SpenSimpleSurfaceView {
         } );
     }
 
+    public SpenNoteDoc getNoteDoc( ) {
+        return _noteDoc ;
+    }
+
+    public SpenPageDoc getNotePage( ) {
+        return _notePage ;
+    }
 
 }
