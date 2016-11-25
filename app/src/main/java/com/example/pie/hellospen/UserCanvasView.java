@@ -1,11 +1,14 @@
 package com.example.pie.hellospen;
 
 import android.app.AlertDialog;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Environment;
 import android.view.MotionEvent;
 import android.view.View;
@@ -40,11 +43,9 @@ class UserCanvasView extends SpenSimpleSurfaceView {
     private String _curFileName ;
     private File _dir ;
 
-
     public UserCanvasView( Context context ) {
         super( context );
         _context = context ;
-
     }
 
     public void initialize( ) {
@@ -115,28 +116,53 @@ class UserCanvasView extends SpenSimpleSurfaceView {
     }
 
     public void saveNoteFile( ) {
-        final String fileName = _dir.getPath () + "/" + Utils.getTimeFileName () ;
-        try {
-            // Save NoteDoc
-            _noteDoc.save ( fileName, false );
-            Toast.makeText ( _context, "Save success to " + fileName, Toast.LENGTH_SHORT ).show ();
-        } catch ( IOException e ) {
-            Toast.makeText ( _context, "Cannot save NoteDoc file : " + fileName + ".",
-                    Toast.LENGTH_SHORT ).show ();
-            e.printStackTrace ();
-            return;
-            //return false;
-        } catch ( Exception e ) {
-            e.printStackTrace ();
-            return;
-            //return false;
-        }
+        final String fileName = _dir.getPath( ) + "/" + Utils.getTimeFileName( );
+        final FullscreenActivity activity = ( FullscreenActivity ) _context;
 
-        /*
-        //**Clear the view.
-        _notePage.removeAllObject ();
-        update ();
-        */
+        AlertDialog.Builder dlg = new AlertDialog.Builder( activity );
+        dlg.setIcon( activity.getResources( ).getDrawable(
+                android.R.drawable.ic_dialog_alert ) );
+        dlg.setTitle( "Save File" )
+                .setMessage( "Do you want to save the file :\n" + fileName + "?" )
+                .setPositiveButton( android.R.string.yes,
+                        new DialogInterface.OnClickListener( ) {
+                            @Override
+                            public void onClick(
+                                    DialogInterface dialog, int which ) {
+                                try {
+                                    // Save NoteDoc
+                                    _noteDoc.save( fileName, false );
+                                    Toast.makeText( _context,
+                                            "Save success to " + fileName, Toast.LENGTH_SHORT ).show( );
+                                } catch( IOException e ) {
+                                    Toast.makeText( _context,
+                                            "Cannot save NoteDoc file : " + fileName + ".",
+                                            Toast.LENGTH_SHORT ).show( );
+                                    e.printStackTrace( );
+                                    return;
+                                } catch( Exception e ) {
+                                    e.printStackTrace( );
+                                    return;
+                                }
+                            }
+                        } )
+                .setNegativeButton( android.R.string.no,
+                        new DialogInterface.OnClickListener( ) {
+                            @Override
+                            public void onClick( DialogInterface dialog, int which ) {
+                                dialog.dismiss( );
+                            }
+                        } )
+                /*
+                .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        dialog.dismiss();
+                    }
+
+                }) */
+                .show( );
+        dlg = null;
     }
 
     public void loadNoteFile() {

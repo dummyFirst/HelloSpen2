@@ -22,9 +22,7 @@ import java.util.GregorianCalendar;
 
 class Utils {
 
-    public static void showAlertDialog(final Activity activity,
-                                       final String msg, final boolean closeActivity) {
-
+    public static void showAlertDialog(final Activity activity, final String msg, final boolean closeActivity) {
         AlertDialog.Builder dlg = new AlertDialog.Builder(activity);
         dlg.setIcon(activity.getResources().getDrawable(
                 android.R.drawable.ic_dialog_alert));
@@ -66,8 +64,7 @@ class Utils {
                             activity.finish();
                         }
                     }
-                })
-                .show();
+                }).show();
         dlg = null;
     }
 

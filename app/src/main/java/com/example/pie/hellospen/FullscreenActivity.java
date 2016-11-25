@@ -129,6 +129,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
     private boolean _isSpenFeatureEnabled;
 
+    MenuItem _new_item ;
     MenuItem _save_item ;
 
     @Override
@@ -280,6 +281,7 @@ public class FullscreenActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu( Menu menu ) {
         MenuInflater inflater = getMenuInflater ();
         inflater.inflate ( R.menu.menu_layout, menu );
+        _new_item = menu.getItem( 0 ) ;
         _save_item = menu.getItem ( 2 ) ;
         return true;
     }
@@ -290,6 +292,7 @@ public class FullscreenActivity extends AppCompatActivity {
         switch ( item.getItemId () ) {
             case R.id.save_item:
                 _canvasView.saveNoteFile( );
+                //Toast.makeText( _context, "b : " + b, Toast.LENGTH_SHORT ).show( ) ;
                 enableEdit ( false );
                 delayedHide ( AUTO_HIDE_DELAY_MILLIS );
                 return true;
@@ -306,7 +309,7 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     private void enableEdit( boolean b ) {
-        if(b==true) {
+        if( b == true ) {
             _canvasView.setToolTypeAction ( _tooltype,
                     SpenSimpleSurfaceView.ACTION_STROKE );
             _editMode = MODE_EDIT;
@@ -322,6 +325,5 @@ public class FullscreenActivity extends AppCompatActivity {
             _save_item.setEnabled ( false ) ;
         }
     }
-
 
 }//**End FullscreenActivity
