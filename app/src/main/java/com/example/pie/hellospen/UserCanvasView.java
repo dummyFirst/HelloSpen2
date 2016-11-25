@@ -1,9 +1,12 @@
 package com.example.pie.hellospen;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.os.Environment;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
@@ -11,12 +14,16 @@ import android.widget.Toast;
 import com.samsung.android.sdk.SsdkUnsupportedException;
 import com.samsung.android.sdk.pen.Spen;
 import com.samsung.android.sdk.pen.SpenSettingPenInfo;
+import com.samsung.android.sdk.pen.document.SpenInvalidPasswordException;
 import com.samsung.android.sdk.pen.document.SpenNoteDoc;
 import com.samsung.android.sdk.pen.document.SpenPageDoc;
+import com.samsung.android.sdk.pen.document.SpenUnsupportedTypeException;
+import com.samsung.android.sdk.pen.document.SpenUnsupportedVersionException;
 import com.samsung.android.sdk.pen.engine.SpenLongPressListener;
 import com.samsung.android.sdk.pen.engine.SpenSimpleSurfaceView;
 import com.samsung.android.sdk.pen.engine.SpenTouchListener;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -30,6 +37,8 @@ class UserCanvasView extends SpenSimpleSurfaceView {
     private Rect _screenRect ;
     private boolean _isSpenFeatureEnabled ;
     private int _tooltype ;
+    private String _curFileName ;
+    private File _dir ;
 
     public UserCanvasView( Context context ) {
         super( context );
@@ -92,14 +101,99 @@ class UserCanvasView extends SpenSimpleSurfaceView {
                     activity.toggle( );
             }
         } );
+
+        // Set the save directory for the file.
+        _dir = new File ( Environment.getExternalStorageDirectory ().getAbsolutePath () + "/SPen/" );
+        if ( !_dir.exists () ) {
+            if ( !_dir.mkdirs () ) {
+                Toast.makeText ( _context, "Save Path Creation Error", Toast.LENGTH_SHORT ).show ();
+                return;
+            }
+        }
+
     }
 
-    public SpenNoteDoc getNoteDoc( ) {
-        return _noteDoc ;
+    public void saveNoteFile( final String fileName ) {
+        try {
+            // Save NoteDoc
+            _noteDoc.save ( fileName, false );
+            Toast.makeText ( _context, "Save success to " + fileName, Toast.LENGTH_SHORT ).show ();
+        } catch ( IOException e ) {
+            Toast.makeText ( _context, "Cannot save NoteDoc file : " + fileName + ".",
+                    Toast.LENGTH_SHORT ).show ();
+            e.printStackTrace ();
+            return;
+            //return false;
+        } catch ( Exception e ) {
+            e.printStackTrace ();
+            return;
+            //return false;
+        }
+
+        //**Clear the view.
+        _notePage.removeAllObject ();
+        update ();
     }
 
-    public SpenPageDoc getNotePage( ) {
-        return _notePage ;
+    public void loadNoteFile() {
+        // Load the file list.
+        final String[] fileList = Utils.setFileList ( _dir, _context );
+        if ( fileList == null ) {
+            return;
+        }
+
+        // Prompt Load File dialog.
+        new AlertDialog.Builder ( _context ).setTitle ( "Select file" )
+                .setItems ( fileList, new DialogInterface.OnClickListener () {
+                    @Override
+                    public void onClick( DialogInterface dialog, int which ) {
+                        String strFilePath = _dir.getPath () + '/' + fileList[ which ];
+                        setSpdFile ( strFilePath );
+
+                    }
+                } ).show ();
+    }
+
+    private void setSpdFile( String fileName ) {
+        _curFileName = fileName ;
+        try {
+            // Create NoteDoc with the selected file.
+            SpenNoteDoc tmpSpenNoteDoc = new SpenNoteDoc ( _context,
+                    fileName, _screenRect.width (),
+                    SpenNoteDoc.MODE_WRITABLE, true );
+            _noteDoc.close ();
+            _noteDoc = tmpSpenNoteDoc;
+            if ( _noteDoc.getPageCount () == 0 ) {
+                _notePage = _noteDoc.appendPage ();
+            } else {
+                _notePage = _noteDoc.getPage ( _noteDoc.getLastEditedPageIndex () );
+            }
+            setPageDoc ( _notePage, true );
+
+
+            update ();
+            //**Disable Spen action.
+            setToolTypeAction ( _tooltype,
+                    SpenSimpleSurfaceView.ACTION_NONE );
+
+            setZoomable ( false );
+
+            Toast.makeText ( _context,
+                    "Successfully loaded noteFile.",
+                    Toast.LENGTH_SHORT ).show ();
+        } catch ( IOException e ) {
+            Toast.makeText ( _context, "Cannot open this file.", Toast.LENGTH_LONG ).show ();
+        } catch ( SpenUnsupportedTypeException e ) {
+            Toast.makeText ( _context, "This file is not supported.", Toast.LENGTH_LONG ).show ();
+        } catch ( SpenInvalidPasswordException e ) {
+            Toast.makeText ( _context, "This file is locked by a password.", Toast.LENGTH_LONG ).show ();
+        } catch ( SpenUnsupportedVersionException e ) {
+            Toast.makeText ( _context, "This file is the version that does not support.",
+                    Toast.LENGTH_LONG ).show ();
+        } catch ( Exception e ) {
+            Toast.makeText ( _context, "Failed to load noteDoc.", Toast.LENGTH_LONG ).show ();
+        }
+
     }
 
 }
