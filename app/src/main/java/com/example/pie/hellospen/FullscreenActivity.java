@@ -122,15 +122,13 @@ public class FullscreenActivity extends AppCompatActivity {
 
     private Button _editButton;
 
-    private int _editMode;
-    private final int MODE_FIRST_EDIT = 1;
-    private final int MODE_READ = 2;
-    private final int MODE_EDIT = 3;
-
     private boolean _isSpenFeatureEnabled;
 
     MenuItem _new_item ;
+    MenuItem _load_item ;
     MenuItem _save_item ;
+
+    private TaskMode _taskMode ;
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -157,6 +155,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
         _context = this;
 
+        _taskMode = new TaskMode() ;
 
         // Initialize Spen
         _isSpenFeatureEnabled = false;
@@ -190,7 +189,7 @@ public class FullscreenActivity extends AppCompatActivity {
         spenViewLayout.addView ( _canvasView );
         _canvasView.initialize ();
 
-        _editMode = MODE_EDIT;
+        _taskMode.setEditMode( TaskMode.MODE_EDIT );
         _editButton.setEnabled ( false );
 
         // Set the save temporary directory for the file.
@@ -282,6 +281,7 @@ public class FullscreenActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater ();
         inflater.inflate ( R.menu.menu_layout, menu );
         _new_item = menu.getItem( 0 ) ;
+        _load_item = menu.getItem( 1 ) ;
         _save_item = menu.getItem ( 2 ) ;
         return true;
     }
@@ -308,18 +308,33 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     }
 
+    public void enableNewItem(boolean b) {
+        _new_item.setEnabled( b ) ;
+    }
+
+    public void enableSaveItem(boolean b) {
+        _save_item.setEnabled( b ) ;
+    }
+    public void enableLoadItem(boolean b) {
+        _load_item.setEnabled( b ) ;
+    }
+
+    public TaskMode getTaskMode( ) {
+        return _taskMode ;
+    }
+
     private void enableEdit( boolean b ) {
         if( b == true ) {
             _canvasView.setToolTypeAction ( _tooltype,
                     SpenSimpleSurfaceView.ACTION_STROKE );
-            _editMode = MODE_EDIT;
+            _taskMode.setEditMode( TaskMode.MODE_EDIT );
             _editButton.setEnabled ( false ) ;
 
             _save_item.setEnabled ( true ) ;
         } else {
             _canvasView.setToolTypeAction ( _tooltype,
                     SpenSimpleSurfaceView.ACTION_NONE );
-            _editMode = MODE_READ;
+            _taskMode.setEditMode( TaskMode.MODE_READ );
             _editButton.setEnabled ( true ) ;
 
             _save_item.setEnabled ( false ) ;

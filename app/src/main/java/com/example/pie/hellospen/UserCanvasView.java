@@ -42,10 +42,12 @@ class UserCanvasView extends SpenSimpleSurfaceView {
     private int _tooltype ;
     private String _curFileName ;
     private File _dir ;
+    private TaskMode _taskMode ;
 
     public UserCanvasView( Context context ) {
         super( context );
         _context = context ;
+        _tooltype = SpenSimpleSurfaceView.TOOL_SPEN ;
     }
 
     public void initialize( ) {
@@ -99,8 +101,18 @@ class UserCanvasView extends SpenSimpleSurfaceView {
         setLongPressListener( new SpenLongPressListener( ) {
             @Override
             public void onLongPressed( MotionEvent motionEvent ) {
-                if( motionEvent.getToolType( 0 ) == MotionEvent.TOOL_TYPE_FINGER )
+                if( motionEvent.getToolType( 0 ) == SpenSimpleSurfaceView.TOOL_FINGER )
                     activity.toggle( );
+            }
+        } );
+        setTouchListener( new SpenTouchListener( ) {
+            @Override
+            public boolean onTouch( View view, MotionEvent motionEvent ) {
+                if( motionEvent.getToolType( 0 ) == SpenSimpleSurfaceView.TOOL_SPEN &&
+                    motionEvent.getAction() == MotionEvent.ACTION_UP ) {
+
+                }
+                return false;
             }
         } );
 
@@ -112,6 +124,9 @@ class UserCanvasView extends SpenSimpleSurfaceView {
                 return;
             }
         }
+
+        _taskMode = ( ( FullscreenActivity ) _context ).getTaskMode() ;
+        _taskMode.setFileMode( TaskMode.FILE_CREATE ) ;
 
     }
 
@@ -153,14 +168,6 @@ class UserCanvasView extends SpenSimpleSurfaceView {
                                 dialog.dismiss( );
                             }
                         } )
-                /*
-                .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        dialog.dismiss();
-                    }
-
-                }) */
                 .show( );
         dlg = null;
     }
@@ -179,7 +186,7 @@ class UserCanvasView extends SpenSimpleSurfaceView {
                     public void onClick( DialogInterface dialog, int which ) {
                         String strFilePath = _dir.getPath () + '/' + fileList[ which ];
                         setSpdFile ( strFilePath );
-
+                        _taskMode.setEditMode( TaskMode.MODE_EDIT ) ;
                     }
                 } ).show ();
     }
