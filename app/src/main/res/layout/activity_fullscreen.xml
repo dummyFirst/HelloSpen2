@@ -7,8 +7,7 @@
     tools:context="com.example.pie.hellospen.FullscreenActivity">
     <RelativeLayout
         android:id="@+id/spenViewLayout"
-        android:keepScreenOn="true"
-
+        android:keepScreenOn="false"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     </RelativeLayout>
