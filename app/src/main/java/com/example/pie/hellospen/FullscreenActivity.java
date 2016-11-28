@@ -117,9 +117,6 @@ public class FullscreenActivity extends AppCompatActivity {
     private int _tooltype;
     //**private Button saveButton ;
 
-    private File _dir;
-    private File _tempDir;
-
     private Button _editButton;
 
     private boolean _isSpenFeatureEnabled;
@@ -189,18 +186,7 @@ public class FullscreenActivity extends AppCompatActivity {
         spenViewLayout.addView ( _canvasView );
         _canvasView.initialize ();
 
-        _taskMode.setEditMode( TaskMode.MODE_EDIT );
-        _editButton.setEnabled ( false );
-
-        // Set the save temporary directory for the file.
-        _tempDir = new File ( Environment.getExternalStorageDirectory ().getAbsolutePath () + "/SPen/.temp/" );
-        if ( !_tempDir.exists () ) {
-            if ( !_tempDir.mkdirs () ) {
-                Toast.makeText ( _context, "Save Temp Path Creation Error",
-                        Toast.LENGTH_SHORT ).show ();
-                return;
-            }
-        }
+        _taskMode.setFileMode ( TaskMode.FILE_CREATE ) ;
 
     }
 
@@ -283,6 +269,7 @@ public class FullscreenActivity extends AppCompatActivity {
         _new_item = menu.getItem( 0 ) ;
         _load_item = menu.getItem( 1 ) ;
         _save_item = menu.getItem ( 2 ) ;
+        enableEdit ( true );
         return true;
     }
 
@@ -292,31 +279,21 @@ public class FullscreenActivity extends AppCompatActivity {
         switch ( item.getItemId () ) {
             case R.id.save_item:
                 _canvasView.saveNoteFile( );
-                //Toast.makeText( _context, "b : " + b, Toast.LENGTH_SHORT ).show( ) ;
                 enableEdit ( false );
+                _taskMode.setFileMode ( TaskMode.FILE_SAVED );
                 delayedHide ( AUTO_HIDE_DELAY_MILLIS );
                 return true;
 
             case R.id.load_item:
-                _canvasView.loadNoteFile( );
+                _canvasView.openFileDialog( );
                 enableEdit ( false );
+                _taskMode.setFileMode ( TaskMode.FILE_LOAD );
                 delayedHide ( AUTO_HIDE_DELAY_MILLIS );
                 return true;
 
             default:
                 return super.onOptionsItemSelected ( item );
         }
-    }
-
-    public void enableNewItem(boolean b) {
-        _new_item.setEnabled( b ) ;
-    }
-
-    public void enableSaveItem(boolean b) {
-        _save_item.setEnabled( b ) ;
-    }
-    public void enableLoadItem(boolean b) {
-        _load_item.setEnabled( b ) ;
     }
 
     public TaskMode getTaskMode( ) {
@@ -327,16 +304,18 @@ public class FullscreenActivity extends AppCompatActivity {
         if( b == true ) {
             _canvasView.setToolTypeAction ( _tooltype,
                     SpenSimpleSurfaceView.ACTION_STROKE );
-            _taskMode.setEditMode( TaskMode.MODE_EDIT );
             _editButton.setEnabled ( false ) ;
-
             _save_item.setEnabled ( true ) ;
+            if(_taskMode.getFileMode () == TaskMode.FILE_CREATE)
+                _taskMode.setFileMode ( TaskMode.FILE_CREATE_EDIT );
+            else if(_taskMode.getFileMode () == TaskMode.FILE_LOAD)
+                _taskMode.setFileMode ( TaskMode.FILE_LOAD_EDIT );
+            else if(_taskMode.getFileMode () == TaskMode.FILE_SAVED)
+                _taskMode.setFileMode ( TaskMode.FILE_SAVED_EDIT );
         } else {
             _canvasView.setToolTypeAction ( _tooltype,
-                    SpenSimpleSurfaceView.ACTION_NONE );
-            _taskMode.setEditMode( TaskMode.MODE_READ );
+                    SpenSimpleSurfaceView.ACTION_NONE ) ;
             _editButton.setEnabled ( true ) ;
-
             _save_item.setEnabled ( false ) ;
         }
     }

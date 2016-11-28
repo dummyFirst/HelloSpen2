@@ -40,9 +40,10 @@ class UserCanvasView extends SpenSimpleSurfaceView {
     private Rect _screenRect ;
     private boolean _isSpenFeatureEnabled ;
     private int _tooltype ;
-    private String _curFileName ;
+
     private File _dir ;
-    private TaskMode _taskMode ;
+    private File _tempDir ;
+    private String _curFileName ;
 
     public UserCanvasView( Context context ) {
         super( context );
@@ -125,8 +126,15 @@ class UserCanvasView extends SpenSimpleSurfaceView {
             }
         }
 
-        _taskMode = ( ( FullscreenActivity ) _context ).getTaskMode() ;
-        _taskMode.setFileMode( TaskMode.FILE_CREATE ) ;
+        // Set the save temporary directory for the file.
+        _tempDir = new File ( Environment.getExternalStorageDirectory ().getAbsolutePath () + "/SPen/.temp/" );
+        if ( !_tempDir.exists () ) {
+            if ( !_tempDir.mkdirs () ) {
+                Toast.makeText ( _context, "Save Temp Path Creation Error",
+                        Toast.LENGTH_SHORT ).show ();
+                return;
+            }
+        }
 
     }
 
@@ -154,10 +162,10 @@ class UserCanvasView extends SpenSimpleSurfaceView {
                                             "Cannot save NoteDoc file : " + fileName + ".",
                                             Toast.LENGTH_SHORT ).show( );
                                     e.printStackTrace( );
-                                    return;
+                                    return ;
                                 } catch( Exception e ) {
                                     e.printStackTrace( );
-                                    return;
+                                    return ;
                                 }
                             }
                         } )
@@ -172,7 +180,7 @@ class UserCanvasView extends SpenSimpleSurfaceView {
         dlg = null;
     }
 
-    public void loadNoteFile() {
+    public void openFileDialog() {
         // Load the file list.
         final String[] fileList = Utils.setFileList ( _dir, _context );
         if ( fileList == null ) {
@@ -185,13 +193,12 @@ class UserCanvasView extends SpenSimpleSurfaceView {
                     @Override
                     public void onClick( DialogInterface dialog, int which ) {
                         String strFilePath = _dir.getPath () + '/' + fileList[ which ];
-                        setSpdFile ( strFilePath );
-                        _taskMode.setEditMode( TaskMode.MODE_EDIT ) ;
+                        loadSpdFile ( strFilePath );
                     }
                 } ).show ();
     }
 
-    private void setSpdFile( String fileName ) {
+    private void loadSpdFile( String fileName ) {
         _curFileName = fileName ;
         try {
             // Create NoteDoc with the selected file.
@@ -210,8 +217,8 @@ class UserCanvasView extends SpenSimpleSurfaceView {
             setZoomable ( false );
 
             Toast.makeText ( _context,
-                    "Successfully loaded noteFile.",
-                    Toast.LENGTH_SHORT ).show ();
+                    "Successfully loaded noteFile.", Toast.LENGTH_SHORT ).show ();
+
         } catch ( IOException e ) {
             Toast.makeText ( _context, "Cannot open this file.", Toast.LENGTH_LONG ).show ();
         } catch ( SpenUnsupportedTypeException e ) {
