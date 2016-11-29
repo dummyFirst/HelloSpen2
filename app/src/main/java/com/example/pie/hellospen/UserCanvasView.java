@@ -161,7 +161,7 @@ class UserCanvasView extends SpenSimpleSurfaceView {
     }
 
     public void saveNoteFile( ) {
-        int taskMode = _taskMode.get() ;
+        int taskMode = _taskMode.get( ) ;
         if( taskMode == TaskMode.TASK_CREATE_TOUCHED ) {
             _saveFileName = _dir.getPath( ) + "/" + Utils.getTimeFileName( );
         } else if( taskMode == TaskMode.TASK_LOAD_TOUCHED ) {
@@ -208,7 +208,7 @@ class UserCanvasView extends SpenSimpleSurfaceView {
                             }
                         } )
                 .show( );
-        dlg = null;
+
     }
 
     public void openFileDialog( ) {
@@ -219,7 +219,7 @@ class UserCanvasView extends SpenSimpleSurfaceView {
         }
 
         // Prompt Load File dialog.
-        new AlertDialog.Builder( _context ).setTitle( "Select file" )
+        AlertDialog.Builder dialog = new AlertDialog.Builder( _context ).setTitle( "Select file" )
                 .setItems( fileList, new DialogInterface.OnClickListener( ) {
                     @Override
                     public void onClick( DialogInterface dialog, int which ) {
@@ -229,7 +229,10 @@ class UserCanvasView extends SpenSimpleSurfaceView {
 
                         _taskDebug.p( "TaskMode : " + _taskMode.get( ) ) ;
                     }
-                } ).show( );
+                } ) ;
+
+        dialog.show( ) ;
+
     }
 
     private void loadSpdFile( String fileName ) {

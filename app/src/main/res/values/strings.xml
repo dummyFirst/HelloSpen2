@@ -2,6 +2,18 @@
     <string name="app_name">HelloSpen</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <!-- Settings -->
+    <string name="cancel">Cancel</string>
+    <string name="done">Done</string>
+    <string name="description" translatable="false">ImageView</string>
+    <string name="hintText" translatable="false">hintText</string>
+    <string name="spd" translatable="false">.spd</string>
+    <string name="png" translatable="false">.png</string>
+    <string name="Title" translatable="false">Title</string>
+    <string name="defaultPenBtn">Default PenList</string>
+    <string name="customPenBtn">Custom PenList</string>
+    <string name="notepadBtn">NotePad</string>
+    <string name="degrees">°</string>
+
 </resources>
