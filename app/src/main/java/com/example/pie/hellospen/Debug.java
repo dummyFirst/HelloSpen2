@@ -8,39 +8,39 @@ import android.widget.Toast;
  */
 
 class Debug {
-    int _mode ;
-    Context _context ;
-    String _prefix ;
+    int _mode;
+    Context _context;
+    String _prefix;
 
-    static final int DEBUG_NONE = 0 ;
-    static final int DEGUG_SHOW = 1 ;
+    static final int DEBUG_NONE = 0;
+    static final int DEGUG_SHOW = 1;
 
     public Debug( Context context ) {
-        _context = context ;
-        _mode = DEGUG_SHOW ;
+        _context = context;
+        _mode = DEGUG_SHOW;
     }
 
     public Debug( Context context, int mode ) {
-        _context = context ;
-        _mode = mode ;
+        _context = context;
+        _mode = mode;
     }
 
-    void p(final String msg) {
-        if( _mode == DEBUG_NONE ) return ;
+    void p( final String msg ) {
+        if ( _mode == DEBUG_NONE ) return;
 
-        Toast.makeText( _context, msg, Toast.LENGTH_SHORT ).show( ) ;
+        Toast.makeText ( _context, msg, Toast.LENGTH_SHORT ).show ();
     }
 
-    void p(final String prefix, final String msg) {
-        p( prefix + msg  ) ;
+    void p( final String prefix, final String msg ) {
+        p ( prefix + msg );
     }
 
-    void set(int mode) {
-        _mode = mode ;
+    void set( int mode ) {
+        _mode = mode;
     }
 
     void setPrefix( String prefix ) {
-        _prefix = prefix ;
+        _prefix = prefix;
     }
 
 }
