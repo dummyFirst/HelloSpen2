@@ -2,6 +2,7 @@ package com.example.pie.hellospen;
 
 import android.app.AlertDialog;
 import android.app.DialogFragment;
+import android.app.backup.FullBackupDataOutput;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -45,9 +46,13 @@ class UserCanvasView extends SpenSimpleSurfaceView {
     private File _dir;
     private File _tempDir;
     private String _curFileName;
+    private String _saveFileName;
 
     private int _strokeCount;
     private int _hoverCount;
+
+    private TaskMode _taskMode ;
+    private Debug _taskDebug ;
 
     public UserCanvasView( Context context ) {
         super( context );
@@ -58,7 +63,10 @@ class UserCanvasView extends SpenSimpleSurfaceView {
 
 
     public void initialize( ) {
-        final FullscreenActivity activity = (FullscreenActivity) _context;
+
+        final FullscreenActivity activity = (FullscreenActivity)_context;
+        _taskDebug = activity._taskDebug ;
+        _taskMode = activity._taskMode ;
 
         _isSpenFeatureEnabled = activity.isSpenFeatureEnabled( );
 
@@ -119,17 +127,19 @@ class UserCanvasView extends SpenSimpleSurfaceView {
                 if( motionEvent.getToolType( 0 ) == SpenSimpleSurfaceView.TOOL_SPEN &&
                         motionEvent.getAction( ) == MotionEvent.ACTION_UP ) {
                     ++_strokeCount;
-                    activity.getTaskMode().setTaskMode( "touched" );
-                    Toast.makeText( _context,
-                            "TaskMode : " + activity.getTaskMode().getTaskMode(),
-                            Toast.LENGTH_SHORT ).show( ) ;
+                    _taskMode.set( "touched" );
+                    if( _strokeCount == 1 ) {
+                        _taskDebug.p( "TaskMode : " + _taskMode.get( ) ) ;
+
+                    }
                 }
                 return false;
             }
         } );
 
         // Set the save directory for the file.
-        _dir = new File( Environment.getExternalStorageDirectory( ).getAbsolutePath( ) + "/SPen/" );
+        _dir = new File( Environment.getExternalStorageDirectory( ).getAbsolutePath( ) +
+                "/SPen/" );
         if( !_dir.exists( ) ) {
             if( !_dir.mkdirs( ) ) {
                 Toast.makeText( _context, "Save Path Creation Error", Toast.LENGTH_SHORT ).show( );
@@ -138,7 +148,8 @@ class UserCanvasView extends SpenSimpleSurfaceView {
         }
 
         // Set the save temporary directory for the file.
-        _tempDir = new File( Environment.getExternalStorageDirectory( ).getAbsolutePath( ) + "/SPen/.temp/" );
+        _tempDir = new File( Environment.getExternalStorageDirectory( ).getAbsolutePath( ) +
+                "/SPen/.temp/" );
         if( !_tempDir.exists( ) ) {
             if( !_tempDir.mkdirs( ) ) {
                 Toast.makeText( _context, "Save Temp Path Creation Error",
@@ -150,14 +161,22 @@ class UserCanvasView extends SpenSimpleSurfaceView {
     }
 
     public void saveNoteFile( ) {
-        final String fileName = _dir.getPath( ) + "/" + Utils.getTimeFileName( );
-        final FullscreenActivity activity = (FullscreenActivity) _context;
+        int taskMode = _taskMode.get() ;
+        if( taskMode == TaskMode.TASK_CREATE_TOUCHED ) {
+            _saveFileName = _dir.getPath( ) + "/" + Utils.getTimeFileName( );
+        } else if( taskMode == TaskMode.TASK_LOAD_TOUCHED ) {
+            _saveFileName = _curFileName;
+        } else if( taskMode == TaskMode.TASK_SAVED_TOUCHED ) {
+            _saveFileName = _curFileName;
+        }
+
+        final FullscreenActivity activity = (FullscreenActivity)_context;
 
         AlertDialog.Builder dlg = new AlertDialog.Builder( activity );
         dlg.setIcon( activity.getResources( ).getDrawable(
                 android.R.drawable.ic_dialog_alert ) );
         dlg.setTitle( "Save File" )
-                .setMessage( "Do you want to save the file :\n" + fileName + "?" )
+                .setMessage( "Do you want to save the file :\n" + _saveFileName + "?" )
                 .setPositiveButton( android.R.string.yes,
                         new DialogInterface.OnClickListener( ) {
                             @Override
@@ -165,12 +184,13 @@ class UserCanvasView extends SpenSimpleSurfaceView {
                                     DialogInterface dialog, int which ) {
                                 try {
                                     // Save NoteDoc
-                                    _noteDoc.save( fileName, false );
+                                    _noteDoc.save( _saveFileName, false );
                                     Toast.makeText( _context,
-                                            "Save success to " + fileName, Toast.LENGTH_SHORT ).show( );
+                                            "Save success to " + _saveFileName, Toast.LENGTH_SHORT ).show( );
+                                    _strokeCount = 0 ;
                                 } catch( IOException e ) {
                                     Toast.makeText( _context,
-                                            "Cannot save NoteDoc file : " + fileName + ".",
+                                            "Cannot save NoteDoc file : " + _saveFileName + ".",
                                             Toast.LENGTH_SHORT ).show( );
                                     e.printStackTrace( );
                                     return;
@@ -205,6 +225,9 @@ class UserCanvasView extends SpenSimpleSurfaceView {
                     public void onClick( DialogInterface dialog, int which ) {
                         String strFilePath = _dir.getPath( ) + '/' + fileList[ which ];
                         loadSpdFile( strFilePath );
+                        _strokeCount = 0 ;
+
+                        _taskDebug.p( "TaskMode : " + _taskMode.get( ) ) ;
                     }
                 } ).show( );
     }
@@ -229,6 +252,7 @@ class UserCanvasView extends SpenSimpleSurfaceView {
 
             Toast.makeText( _context,
                     "Successfully loaded noteFile.", Toast.LENGTH_SHORT ).show( );
+
 
         } catch( IOException e ) {
             Toast.makeText( _context, "Cannot open this file.", Toast.LENGTH_LONG ).show( );

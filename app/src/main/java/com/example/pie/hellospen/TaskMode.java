@@ -26,18 +26,18 @@ class TaskMode {
         _taskMode = TASK_NONE ;
     }
 
-    public int getTaskMode( ) {
+    public int get( ) {
         return _taskMode ;
     }
 
-    public void setTaskMode( final int taskMode ) {
+    public void set( final int taskMode ) {
         _taskMode = taskMode;
     }
 
     /*
         edit, touched
      */
-    public void setTaskMode(String label) {
+    public void set(String label) {
         if( _taskMode % 10 == 1 && label.equalsIgnoreCase( "touched" ) ) {
             _taskMode += 1;
         }

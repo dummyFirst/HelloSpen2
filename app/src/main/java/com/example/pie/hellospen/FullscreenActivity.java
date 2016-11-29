@@ -110,10 +110,13 @@ public class FullscreenActivity extends AppCompatActivity {
                     | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION );
         }
     };
+
     private int _tooltype;
     private Button _editButton;
     private boolean _isSpenFeatureEnabled;
-    private TaskMode _taskMode;
+
+    TaskMode _taskMode;
+    Debug _taskDebug ;
 
     public boolean isSpenFeatureEnabled( ) {
         return _isSpenFeatureEnabled;
@@ -123,6 +126,8 @@ public class FullscreenActivity extends AppCompatActivity {
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_fullscreen );
+
+        _taskDebug = new Debug( this, Debug.DEGUG_SHOW ) ;
 
         mVisible = true;
         mControlsView = findViewById( R.id.fullscreen_content_controls );
@@ -178,11 +183,10 @@ public class FullscreenActivity extends AppCompatActivity {
         spenViewLayout.addView( _canvasView );
         _canvasView.initialize( );
 
-        _taskMode.setTaskMode( TaskMode.TASK_CREATE );
+        _taskMode.set( TaskMode.TASK_CREATE );
 
-        Toast.makeText( _context,
-                "TaskMode : " + _taskMode.getTaskMode(),
-                Toast.LENGTH_SHORT ).show( ) ;
+
+        _taskDebug.p( "TaskMode : " + _taskMode.get() ) ;
 
     }
 
@@ -276,22 +280,20 @@ public class FullscreenActivity extends AppCompatActivity {
             case R.id.save_item:
                 _canvasView.saveNoteFile( );
                 enableEdit( false );
-                _taskMode.setTaskMode( TaskMode.TASK_SAVED );
+                _taskMode.set( TaskMode.TASK_SAVED );
                 delayedHide( AUTO_HIDE_DELAY_MILLIS );
-                Toast.makeText( _context,
-                        "TaskMode : " + _taskMode.getTaskMode(),
-                        Toast.LENGTH_SHORT ).show( ) ;
+
+                _taskDebug.p( "TaskMode : " + _taskMode.get() ) ;
+
                 return true;
 
             case R.id.load_item:
                 _canvasView.openFileDialog( );
                 enableEdit( false );
-                _taskMode.setTaskMode( TaskMode.TASK_LOAD );
+                _taskMode.set( TaskMode.TASK_LOAD );
 
                 delayedHide( AUTO_HIDE_DELAY_MILLIS );
-                Toast.makeText( _context,
-                        "TaskMode : " + _taskMode.getTaskMode(),
-                        Toast.LENGTH_SHORT ).show( ) ;
+
                 return true;
 
             default:
@@ -313,12 +315,12 @@ public class FullscreenActivity extends AppCompatActivity {
                     SpenSimpleSurfaceView.ACTION_STROKE );
             _editButton.setEnabled( false );
             _save_item.setEnabled( true );
-            if( _taskMode.getTaskMode( ) == TaskMode.TASK_CREATE ) {
-                _taskMode.setTaskMode( TaskMode.TASK_CREATE_EDIT );
-            } else if( _taskMode.getTaskMode( ) == TaskMode.TASK_LOAD ) {
-                _taskMode.setTaskMode( TaskMode.TASK_LOAD_EDIT );
-            } else if( _taskMode.getTaskMode( ) == TaskMode.TASK_SAVED ) {
-                _taskMode.setTaskMode( TaskMode.TASK_SAVED_EDIT );
+            if( _taskMode.get( ) == TaskMode.TASK_CREATE ) {
+                _taskMode.set( TaskMode.TASK_CREATE_EDIT );
+            } else if( _taskMode.get( ) == TaskMode.TASK_LOAD ) {
+                _taskMode.set( TaskMode.TASK_LOAD_EDIT );
+            } else if( _taskMode.get( ) == TaskMode.TASK_SAVED ) {
+                _taskMode.set( TaskMode.TASK_SAVED_EDIT );
             }
         } else {
             _canvasView.setToolTypeAction( _tooltype,
@@ -326,9 +328,9 @@ public class FullscreenActivity extends AppCompatActivity {
             _editButton.setEnabled( true );
             _save_item.setEnabled( false );
         }
-        Toast.makeText( _context,
-                "TaskMode : " + _taskMode.getTaskMode(),
-                Toast.LENGTH_SHORT ).show( ) ;
+
+        _taskDebug.p( "TaskMode : " + _taskMode.get() ) ;
+
     }
 
 }//**End FullscreenActivity
