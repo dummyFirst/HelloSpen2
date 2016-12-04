@@ -262,11 +262,11 @@ class UserCanvasView extends SpenSimpleSurfaceView {
 
     }
 
-    private void loadSpdFile( String fileName ) {
+    private void loadSpdFile( String filePath ) {
         try {
             // Create NoteDoc with the selected file.
             SpenNoteDoc tmpSpenNoteDoc = new SpenNoteDoc( _context,
-                    fileName, _screenRect.width( ),
+                    filePath, _screenRect.width( ),
                     SpenNoteDoc.MODE_WRITABLE, true );
             _noteDoc.close( );
             _noteDoc = tmpSpenNoteDoc;
