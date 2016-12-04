@@ -173,7 +173,6 @@ class UserCanvasView extends SpenSimpleSurfaceView {
 
     void newNoteFile( ) {
         FullscreenActivity activity = ( FullscreenActivity ) _context;
-
         if( _isTouched ) saveNoteFile( ) ;
 
         // Clear _noteDoc
@@ -206,7 +205,7 @@ class UserCanvasView extends SpenSimpleSurfaceView {
         _notePage.setBackgroundColor( Color.WHITE );
         _notePage.clearHistory( );
         setPageDoc( _notePage, true );
-
+        _isTouched = false ;
     }
 
     boolean saveNoteFile( ) {
