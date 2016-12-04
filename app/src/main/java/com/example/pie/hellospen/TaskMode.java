@@ -20,26 +20,26 @@ class TaskMode {
     static final int TASK_SAVED_EDIT = 31;
     static final int TASK_SAVED_TOUCHED = 32;
 
-    private int _taskMode;
+    private int _mode;
 
     TaskMode( ) {
-        _taskMode = TASK_NONE;
+        _mode = TASK_NONE;
     }
 
     int get( ) {
-        return _taskMode;
+        return _mode;
     }
 
     void set( final int taskMode ) {
-        _taskMode = taskMode;
+        _mode = taskMode;
     }
 
     /*
         edit, touched
      */
-    void set( String label ) {
-        if( _taskMode % 10 == 1 && label.equalsIgnoreCase( "touched" ) ) {
-            _taskMode += 1;
+    void setTouched( ) {
+        if( _mode % 10 == 1 ) {
+            _mode += 1;
         }
     }
 

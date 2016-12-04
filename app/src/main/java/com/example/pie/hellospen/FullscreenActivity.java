@@ -205,10 +205,10 @@ public class FullscreenActivity extends AppCompatActivity {
         switch( item.getItemId( ) ) {
             case R.id.new_item:
                 _canvasView.newNoteFile( );
-                _taskDebug.p( "TaskMode : " + _taskMode.get( ) );
-
-                enableEdit( true );
                 _taskMode.set( TaskMode.TASK_CREATE );
+                _new_item.setEnabled( false ) ;
+                _taskDebug.p( "TaskMode : " + _taskMode.get( ) );
+                enableEdit( true );
                 delayedHide( AUTO_HIDE_DELAY_MILLIS );
                 _taskDebug.p( "TaskMode : " + _taskMode.get( ) );
 
