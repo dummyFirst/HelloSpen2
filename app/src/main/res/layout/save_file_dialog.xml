@@ -2,13 +2,13 @@
     android:id="@+id/layout_root"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:padding="10dp" >
 
     <EditText
         android:id="@+id/input_path"
-        android:layout_width="200dip"
-        android:layout_height="35dip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginRight="10dp"
         android:hint="@string/hintText" />

@@ -194,9 +194,9 @@ public class FullscreenActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu( Menu menu ) {
         MenuInflater inflater = getMenuInflater( );
         inflater.inflate( R.menu.menu_layout, menu );
-        _new_item = menu.getItem( 0 );
-        _load_item = menu.getItem( 1 );
-        _save_item = menu.getItem( 2 );
+        _new_item = menu.getItem(0);
+        _load_item = menu.getItem(1);
+        _save_item = menu.getItem(2);
         enableEdit( true );
         return true;
     }

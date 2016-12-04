@@ -122,7 +122,6 @@ class Utils {
         label = Integer.toString ( yy ) + "-" + Integer.toString ( mo ) + "-" + Integer.toString ( dd );
         label += "_" + Integer.toString ( hh ) + "_" + Integer.toString ( mm ) +
                 "_" + Integer.toString ( miliSec );
-        label += ".spd";
 
         return label;
     }
