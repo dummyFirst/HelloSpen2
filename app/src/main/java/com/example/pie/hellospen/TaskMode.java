@@ -9,7 +9,7 @@ import android.content.Context;
 
 class TaskMode {
 
-    public static final int TASK_NONE = 0 ;
+    public static final int TASK_NONE = -1;
     public static final int TASK_CREATE = 10 ;
     public static final int TASK_CREATE_EDIT = 11 ;
     public static final int TASK_CREATE_TOUCHED = 12 ;

@@ -86,8 +86,6 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     };
     private Context _context;
-    private SpenNoteDoc _noteDoc;
-    private SpenPageDoc _notePage;
     //**private SpenSimpleSurfaceView _canvasView;
     private UserCanvasView _canvasView;
     //**private Button saveButton ;
@@ -205,37 +203,48 @@ public class FullscreenActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected( MenuItem item ) {
         // Handle item selection
         switch( item.getItemId( ) ) {
-            case R.id.save_item:
-                _canvasView.saveNoteFile( );
-                enableEdit( false );
-                _taskMode.set( TaskMode.TASK_SAVED );
-                delayedHide( AUTO_HIDE_DELAY_MILLIS );
+        case R.id.new_item :
+            _canvasView.newNoteFile ();
+            _taskDebug.p( "TaskMode : " + _taskMode.get() ) ;
 
-                _taskDebug.p( "TaskMode : " + _taskMode.get() ) ;
+            enableEdit ( true );
+            _taskMode.set( TaskMode.TASK_CREATE ) ;
+            delayedHide ( AUTO_HIDE_DELAY_MILLIS );
+            _taskDebug.p( "TaskMode : " + _taskMode.get() ) ;
 
-                return true;
+            return true ;
+        case R.id.save_item:
+            _canvasView.saveNoteFile( );
+            enableEdit( false );
+            _taskMode.set( TaskMode.TASK_SAVED );
+            delayedHide( AUTO_HIDE_DELAY_MILLIS );
 
-            case R.id.load_item:
-                _canvasView.openFileDialog( );
-                enableEdit( false );
-                _taskMode.set( TaskMode.TASK_LOAD );
+            _taskDebug.p( "TaskMode : " + _taskMode.get() ) ;
 
-                delayedHide( AUTO_HIDE_DELAY_MILLIS );
+            return true;
 
-                return true;
+        case R.id.load_item:
+            _canvasView.openFileDialog( );
+            enableEdit( false );
+            _taskMode.set( TaskMode.TASK_LOAD );
+            delayedHide( AUTO_HIDE_DELAY_MILLIS );
 
-            default:
-                return super.onOptionsItemSelected( item );
+            //**_taskDebug.p --> UserCanvasView.openFileDialog( )
+            return true;
+
+        default:
+            return super.onOptionsItemSelected( item );
         }
     }
 
-    private void enableEdit( boolean b ) {
+    public void enableEdit( boolean b ) {
         if( b == true ) {
             _canvasView.setToolTypeAction( _tooltype,
                     SpenSimpleSurfaceView.ACTION_STROKE );
             _editButton.setEnabled( false );
             _save_item.setEnabled( true );
             if( _taskMode.get( ) == TaskMode.TASK_CREATE ) {
+                _new_item.setEnabled ( false ) ;
                 _taskMode.set( TaskMode.TASK_CREATE_EDIT );
             } else if( _taskMode.get( ) == TaskMode.TASK_LOAD ) {
                 _taskMode.set( TaskMode.TASK_LOAD_EDIT );
@@ -316,14 +325,6 @@ public class FullscreenActivity extends AppCompatActivity {
             _canvasView = null;
         }
 
-        if( _noteDoc != null ) {
-            try {
-                _noteDoc.close( );
-            } catch( Exception e ) {
-                e.printStackTrace( );
-            }
-            _noteDoc = null;
-        }
     }
 
 
