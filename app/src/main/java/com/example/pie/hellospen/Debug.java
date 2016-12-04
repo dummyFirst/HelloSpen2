@@ -15,24 +15,24 @@ class Debug {
     static final int DEBUG_NONE = 0;
     static final int DEGUG_SHOW = 1;
 
-    public Debug( Context context ) {
+    Debug( Context context ) {
         _context = context;
         _mode = DEGUG_SHOW;
     }
 
-    public Debug( Context context, int mode ) {
+    Debug( Context context, int mode ) {
         _context = context;
         _mode = mode;
     }
 
     void p( final String msg ) {
-        if ( _mode == DEBUG_NONE ) return;
+        if( _mode == DEBUG_NONE ) return;
 
-        Toast.makeText ( _context, msg, Toast.LENGTH_SHORT ).show ();
+        Toast.makeText( _context, msg, Toast.LENGTH_SHORT ).show( );
     }
 
     void p( final String prefix, final String msg ) {
-        p ( prefix + msg );
+        p( prefix + msg );
     }
 
     void set( int mode ) {
