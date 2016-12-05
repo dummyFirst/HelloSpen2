@@ -52,31 +52,28 @@ class UserCanvasView extends SpenSimpleSurfaceView {
     private File _dir;
     private File _tempDir;
     private String _curFilePath;
-    private String _saveFileName;
-
-    private int _strokeCount;
+    private String _saveFileName ;
 
     private TaskMode _taskMode;
-    private Debug _taskDebug;
     private boolean _ret ;
 
     boolean _isTouched ;
+    Debug _d ;
 
     public UserCanvasView( Context context ) {
         super( context );
         _context = context;
         _tooltype = SpenSimpleSurfaceView.TOOL_SPEN;
-        _strokeCount = 0;
         _curFilePath = "";
         _ret = false ;
         _isTouched = false ;
+        _d = new Debug( context, Debug.SHOW ) ;
     }
 
 
     public void initialize( ) {
 
         final FullscreenActivity activity = ( FullscreenActivity ) _context;
-        _taskDebug = activity._taskDebug;
         _taskMode = activity._taskMode;
 
         _isSpenFeatureEnabled = activity.isSpenFeatureEnabled( );
@@ -133,15 +130,10 @@ class UserCanvasView extends SpenSimpleSurfaceView {
             public boolean onTouch( View view, MotionEvent motionEvent ) {
                 if( motionEvent.getToolType( 0 ) == SpenSimpleSurfaceView.TOOL_SPEN &&
                         motionEvent.getAction( ) == MotionEvent.ACTION_UP ) {
-                    ++ _strokeCount;
                     _isTouched = true ;
-                    if( _strokeCount == 1 ) {
-                        _taskDebug.p( "Task Mode : " + _taskMode.get( ) );
 
-                    }
                     if( (_taskMode.get( ) % 10) == 1 ) {
                         _taskMode.setTouched() ;
-                        _taskDebug.p( "Task Mode : " + _taskMode.get( ) ) ;
                         ( ( FullscreenActivity ) _context )._new_item.setEnabled( true );
                         ( ( FullscreenActivity ) _context )._save_item.setEnabled( true );
                         ( ( FullscreenActivity ) _context )._load_item.setEnabled( true );
@@ -173,7 +165,10 @@ class UserCanvasView extends SpenSimpleSurfaceView {
 
     void newNoteFile( ) {
         FullscreenActivity activity = ( FullscreenActivity ) _context;
-        if( _isTouched ) saveNoteFile( ) ;
+        if( _isTouched ) {
+            _d.p( "Before saveNoteFile( )") ;
+            saveNoteFile( ) ;
+        }
 
         // Clear _noteDoc
         if( _noteDoc != null ) {
@@ -210,17 +205,19 @@ class UserCanvasView extends SpenSimpleSurfaceView {
 
     boolean saveNoteFile( ) {
         int taskMode = _taskMode.get( );
-        if( taskMode == TaskMode.TASK_CREATE_TOUCHED ) {
+        if( taskMode == TaskMode.CREATE_TOUCHED ) {
             _saveFileName = Utils.getTimeFileName( );
-        } else if( taskMode == TaskMode.TASK_LOAD_TOUCHED ) {
-            _saveFileName = _curFilePath.substring( _curFilePath.lastIndexOf( "/" ) + 1, _curFilePath.lastIndexOf( "." ) );
-            _taskDebug.p( _saveFileName );
-        } else if( taskMode == TaskMode.TASK_SAVED_TOUCHED ) {
-            _saveFileName = _curFilePath.substring( _curFilePath.lastIndexOf( "/" ) + 1, _curFilePath.lastIndexOf( "." ) );
-            _taskDebug.p( _saveFileName );
+        } else if( taskMode == TaskMode.LOAD_TOUCHED ) {
+            _saveFileName = _curFilePath.substring( _curFilePath.lastIndexOf( "/" ) + 1,
+                    _curFilePath.lastIndexOf( "." ) - 1 );
+
+        } else if( taskMode == TaskMode.SAVED_TOUCHED ) {
+            _saveFileName = _curFilePath.substring( _curFilePath.lastIndexOf( "/" ) + 1,
+                    _curFilePath.lastIndexOf( "." ) - 1 );
         }
 
         final FullscreenActivity activity = ( FullscreenActivity ) _context;
+        _ret = false ;
 
         // Prompt Save File dialog to get the file name
         // and get its save format option (note file or image).
@@ -232,6 +229,8 @@ class UserCanvasView extends SpenSimpleSurfaceView {
         dlg.setIcon(  activity.getResources( ).getDrawable( android.R.drawable.ic_dialog_alert ) );
 
         final String fileName = _saveFileName;
+        _d.p( "_saveFileName : " + _saveFileName + "\n" +
+            "TaskMode : " + _taskMode.getString( ) ) ;
 
         final EditText inputPath = ( EditText ) layout.findViewById( R.id.input_path );
         inputPath.setText( fileName );
@@ -245,10 +244,12 @@ class UserCanvasView extends SpenSimpleSurfaceView {
                             // Save NoteDoc
                             _noteDoc.save( _dir.getAbsolutePath( ) + "/" +
                                     inputPath.getText( ) + ".spd", false );
-                            Toast.makeText( _context, "Save success to " + _saveFileName + ".spd", Toast.LENGTH_SHORT ).show( );
-                            _curFilePath = _dir.getAbsolutePath( ) + inputPath.getText( ) + ".spd";
 
-                            _strokeCount = 0;
+                            _curFilePath = _dir.getAbsolutePath( ) + inputPath.getText( ) + ".spd";
+                            Toast.makeText( _context, "Save success to " + inputPath.getText() + ".spd",
+                                    Toast.LENGTH_SHORT ).show( );
+
+                            _isTouched = false ;
                             _ret = true ;
                         } catch( IOException e ) {
                             Toast.makeText( _context, "Cannot save NoteDoc file : " + _saveFileName + ".spd.", Toast.LENGTH_SHORT ).show( );
@@ -288,9 +289,8 @@ class UserCanvasView extends SpenSimpleSurfaceView {
                     String strFilePath = _dir.getPath( ) + '/' + fileList[ which ];
                     loadSpdFile( strFilePath );
                     _curFilePath = strFilePath;
-                    _strokeCount = 0;
+                    _isTouched = false ;
 
-                    _taskDebug.p( "TaskMode : " + _taskMode.get( ) );
                 }
         } );
 
@@ -313,7 +313,11 @@ class UserCanvasView extends SpenSimpleSurfaceView {
             update( );
             setZoomable( false );
 
-            Toast.makeText( _context, "Successfully loaded noteFile.", Toast.LENGTH_SHORT ).show( );
+
+            String fileName = filePath.substring( filePath.lastIndexOf( "/" ) + 1,
+                    filePath.length() - 1 ) ;
+            Toast.makeText( _context, "Successfully loaded noteFile : " + fileName,
+                    Toast.LENGTH_SHORT ).show( );
 
 
         } catch( IOException e ) {

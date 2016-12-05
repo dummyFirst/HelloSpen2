@@ -114,7 +114,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private boolean _isSpenFeatureEnabled;
 
     TaskMode _taskMode;
-    Debug _taskDebug;
+
 
     public boolean isSpenFeatureEnabled( ) {
         return _isSpenFeatureEnabled;
@@ -124,8 +124,6 @@ public class FullscreenActivity extends AppCompatActivity {
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_fullscreen );
-
-        _taskDebug = new Debug( this, Debug.DEGUG_SHOW );
 
         mVisible = true;
         mControlsView = findViewById( R.id.fullscreen_content_controls );
@@ -147,7 +145,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
         _context = this;
 
-        _taskMode = new TaskMode( );
+        _taskMode = new TaskMode( this );
 
         // Initialize Spen
         _isSpenFeatureEnabled = false;
@@ -181,10 +179,7 @@ public class FullscreenActivity extends AppCompatActivity {
         spenViewLayout.addView( _canvasView );
         _canvasView.initialize( );
 
-        _taskMode.set( TaskMode.TASK_CREATE );
-
-
-        _taskDebug.p( "TaskMode : " + _taskMode.get( ) );
+        _taskMode.set( TaskMode.CREATE );
 
     }
 
@@ -192,6 +187,7 @@ public class FullscreenActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu( Menu menu ) {
         MenuInflater inflater = getMenuInflater( );
         inflater.inflate( R.menu.menu_layout, menu );
+
         _new_item = menu.getItem( 0 );
         _load_item = menu.getItem( 1 );
         _save_item = menu.getItem( 2 );
@@ -205,31 +201,24 @@ public class FullscreenActivity extends AppCompatActivity {
         switch( item.getItemId( ) ) {
             case R.id.new_item:
                 _canvasView.newNoteFile( );
-                _taskMode.set( TaskMode.TASK_CREATE );
+                _taskMode.set( TaskMode.CREATE );
                 _new_item.setEnabled( false ) ;
-                _taskDebug.p( "TaskMode : " + _taskMode.get( ) );
                 enableEdit( true );
                 delayedHide( AUTO_HIDE_DELAY_MILLIS );
-                _taskDebug.p( "TaskMode : " + _taskMode.get( ) );
-
                 return true;
+
             case R.id.save_item:
                 _canvasView.saveNoteFile( );
                 enableEdit( false );
-                _taskMode.set( TaskMode.TASK_SAVED );
+                _taskMode.set( TaskMode.SAVED );
                 delayedHide( AUTO_HIDE_DELAY_MILLIS );
-
-                _taskDebug.p( "TaskMode : " + _taskMode.get( ) );
-
                 return true;
 
             case R.id.load_item:
                 _canvasView.openFileDialog( );
                 enableEdit( false );
-                _taskMode.set( TaskMode.TASK_LOAD );
+                _taskMode.set( TaskMode.LOAD );
                 delayedHide( AUTO_HIDE_DELAY_MILLIS );
-
-                //**_taskDebug.p --> UserCanvasView.openFileDialog( )
                 return true;
 
             default:
@@ -243,13 +232,13 @@ public class FullscreenActivity extends AppCompatActivity {
                     SpenSimpleSurfaceView.ACTION_STROKE );
             _editButton.setEnabled( false );
             _save_item.setEnabled( true );
-            if( _taskMode.get( ) == TaskMode.TASK_CREATE ) {
+            if( _taskMode.get( ) == TaskMode.CREATE ) {
                 _new_item.setEnabled( false );
-                _taskMode.set( TaskMode.TASK_CREATE_EDIT );
-            } else if( _taskMode.get( ) == TaskMode.TASK_LOAD ) {
-                _taskMode.set( TaskMode.TASK_LOAD_EDIT );
-            } else if( _taskMode.get( ) == TaskMode.TASK_SAVED ) {
-                _taskMode.set( TaskMode.TASK_SAVED_EDIT );
+                _taskMode.set( TaskMode.CREATE_EDIT );
+            } else if( _taskMode.get( ) == TaskMode.LOAD ) {
+                _taskMode.set( TaskMode.LOAD_EDIT );
+            } else if( _taskMode.get( ) == TaskMode.SAVED ) {
+                _taskMode.set( TaskMode.SAVED_EDIT );
             }
         } else {
             _canvasView.setToolTypeAction( _tooltype,
@@ -257,8 +246,6 @@ public class FullscreenActivity extends AppCompatActivity {
             _editButton.setEnabled( true );
             _save_item.setEnabled( false );
         }
-
-        _taskDebug.p( "TaskMode : " + _taskMode.get( ) );
 
     }
 

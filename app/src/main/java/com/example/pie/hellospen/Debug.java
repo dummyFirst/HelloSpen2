@@ -12,12 +12,12 @@ class Debug {
     Context _context;
     String _prefix;
 
-    static final int DEBUG_NONE = 0;
-    static final int DEGUG_SHOW = 1;
+    static final int NONE = 0;
+    static final int SHOW = 1;
 
     Debug( Context context ) {
         _context = context;
-        _mode = DEGUG_SHOW;
+        _mode = SHOW;
     }
 
     Debug( Context context, int mode ) {
@@ -26,7 +26,7 @@ class Debug {
     }
 
     void p( final String msg ) {
-        if( _mode == DEBUG_NONE ) return;
+        if( _mode == NONE ) return;
 
         Toast.makeText( _context, msg, Toast.LENGTH_SHORT ).show( );
     }
