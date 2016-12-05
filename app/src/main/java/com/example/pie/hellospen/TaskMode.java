@@ -89,4 +89,18 @@ class TaskMode {
         return str ;
     }
 
+    boolean isTouched( ) {
+        boolean b = false ;
+
+        switch( _mode ) {
+        case CREATE_TOUCHED :
+        case LOAD_TOUCHED :
+        case SAVED_TOUCHED :
+            b = true ;
+            break ;
+        }
+
+        return b ;
+    }
+
 }
