@@ -44,13 +44,26 @@ class TaskMode {
      */
     void setTouched( ) {
         if( _mode == CREATE_EDIT ) {
-            _mode = CREATE_TOUCHED;
+            set( CREATE_TOUCHED );
         } else if( _mode == LOAD_EDIT ) {
-            _mode = LOAD_TOUCHED;
+            set( LOAD_TOUCHED );
         } else if( _mode == SAVED_EDIT ) {
-            _mode = SAVED_TOUCHED;
+            set( SAVED_TOUCHED );
         } else {
             _debug.p( "setTouched : _mode is not ~_EDIT" ) ;
+        }
+        _debug.p( "TaskMode : " +  _mode ) ;
+    }
+
+    void setEdit( ) {
+        if( _mode == CREATE ) {
+            set( CREATE_EDIT ) ;
+        } else if( _mode == LOAD ) {
+            set( LOAD_EDIT ) ;
+        } else if( _mode == SAVED ) {
+            set( SAVED_EDIT ) ;
+        } else {
+            _debug.p( "setTouched : _mode is NOT first" ) ;
         }
         _debug.p( "TaskMode : " +  _mode ) ;
     }
@@ -103,4 +116,17 @@ class TaskMode {
         return b ;
     }
 
+    boolean isEdit( ) {
+        boolean b = false ;
+
+        switch( _mode ) {
+            case CREATE_EDIT :
+            case LOAD_EDIT :
+            case SAVED_EDIT :
+                b = true ;
+                break ;
+        }
+
+        return b ;
+    }
 }

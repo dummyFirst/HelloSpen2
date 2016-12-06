@@ -1,6 +1,7 @@
 package com.example.pie.hellospen;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 /**
@@ -11,6 +12,7 @@ class Debug {
     int _mode;
     Context _context;
     String _prefix;
+    String _tag ;
 
     static final int NONE = 0;
     static final int SHOW = 1;
@@ -18,6 +20,7 @@ class Debug {
     Debug( Context context ) {
         _context = context;
         _mode = SHOW;
+        _prefix = null ;
     }
 
     Debug( Context context, int mode ) {
@@ -25,8 +28,14 @@ class Debug {
         _mode = mode;
     }
 
+    Debug( final String tag, final int mode ) {
+        _tag = tag ;
+        _mode = mode ;
+    }
+
     void p( final String msg ) {
         if( _mode == NONE ) return;
+        String str = "" ;
 
         Toast.makeText( _context, msg, Toast.LENGTH_SHORT ).show( );
     }
@@ -43,4 +52,8 @@ class Debug {
         _prefix = prefix;
     }
 
+    void i( final String msg ) {
+        if( _mode == NONE ) return;
+        Log.i( _tag, msg) ;
+    }
 }

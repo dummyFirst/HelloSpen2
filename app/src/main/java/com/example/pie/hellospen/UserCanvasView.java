@@ -59,7 +59,7 @@ class UserCanvasView extends SpenSimpleSurfaceView {
 
     boolean _isTouched ;
     Debug _d ;
-
+    Debug _i ;
     public UserCanvasView( Context context ) {
         super( context );
         _context = context;
@@ -68,6 +68,7 @@ class UserCanvasView extends SpenSimpleSurfaceView {
         _ret = false ;
         _isTouched = false ;
         _d = new Debug( context, Debug.SHOW ) ;
+        _i = new Debug( "UserCanvasView:: ", Debug.SHOW ) ;
     }
 
 
@@ -132,11 +133,9 @@ class UserCanvasView extends SpenSimpleSurfaceView {
                         motionEvent.getAction( ) == MotionEvent.ACTION_UP ) {
                     _isTouched = true ;
 
-                    if( (_taskMode.get( ) % 10) == 1 ) {
+                    if( _taskMode.isEdit() ) {
                         _taskMode.setTouched() ;
-                        ( ( FullscreenActivity ) _context )._new_item.setEnabled( true );
-                        ( ( FullscreenActivity ) _context )._save_item.setEnabled( true );
-                        ( ( FullscreenActivity ) _context )._load_item.setEnabled( true );
+                        activity.enableMenuOnMode( _taskMode.get() );
                     }
                 }
                 return false;
@@ -163,11 +162,11 @@ class UserCanvasView extends SpenSimpleSurfaceView {
 
     }
 
-    void newNoteFile( ) {
+    boolean newNoteFile( ) {
         FullscreenActivity activity = ( FullscreenActivity ) _context;
         if( _isTouched ) {
             _d.p( "Before saveNoteFile( )") ;
-            if( !saveNoteFile( ) ) return ;
+            if( !saveNoteFile( ) ) return false ;
         }
 
         // Clear _noteDoc
@@ -201,12 +200,14 @@ class UserCanvasView extends SpenSimpleSurfaceView {
         _notePage.clearHistory( );
         setPageDoc( _notePage, true );
         _isTouched = false ;
+
+        return true ;
     }
 
     boolean saveNoteFile( ) {
 
         int taskMode = _taskMode.get( );
-        if( taskMode == TaskMode.CREATE_TOUCHED ) {
+        if( taskMode == TaskMode.CREATE_TOUCHED || _curFilePath.length() == 0 ) {
             _saveFileName = Utils.getTimeFileName( );
         } else if( taskMode == TaskMode.LOAD_TOUCHED ) {
             _saveFileName = _curFilePath.substring( _curFilePath.lastIndexOf( "/" ) + 1,
@@ -271,18 +272,18 @@ class UserCanvasView extends SpenSimpleSurfaceView {
         return _ret ;
     }
 
-    void openFileDialog( ) {
+    boolean openFileDialog( ) {
         if( _taskMode.isTouched() ) {
             _d.p("Before : saveNoteFile()") ;
             if( !saveNoteFile( ) ) {
-                return ;
+                return false ;
             }
         }
 
         // Load the file list.
         final String[] fileList = Utils.setFileList( _dir, _context );
         if( fileList == null ) {
-            return;
+            return false ;
         }
 
         // Prompt Load File dialog.
@@ -301,6 +302,7 @@ class UserCanvasView extends SpenSimpleSurfaceView {
 
         dialog.show( );
 
+        return true ;
     }
 
     private void loadSpdFile( String filePath ) {

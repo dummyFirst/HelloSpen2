@@ -25,6 +25,8 @@ import com.samsung.android.sdk.pen.engine.SpenSimpleSurfaceView;
 
 import java.io.File;
 
+import static com.example.pie.hellospen.TaskMode.CREATE_EDIT;
+
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -114,7 +116,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private boolean _isSpenFeatureEnabled;
 
     TaskMode _taskMode;
-
+    boolean _isEditable ;
 
     public boolean isSpenFeatureEnabled( ) {
         return _isSpenFeatureEnabled;
@@ -125,20 +127,32 @@ public class FullscreenActivity extends AppCompatActivity {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_fullscreen );
 
+        _isEditable = false ;
         mVisible = true;
         mControlsView = findViewById( R.id.fullscreen_content_controls );
 
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
-        //findViewById(R.id.edit_button).setOnTouchListener(mDelayHideTouchListener);
+        //findViewById(R.id.edit_button).se tOnTouchListener(mDelayHideTouchListener);
         //**
         _editButton = ( Button ) findViewById( R.id.edit_button );
         _editButton.setOnClickListener(
                 new View.OnClickListener( ) {
                     @Override
                     public void onClick( View v ) {
-                        enableEdit( true );
+                        if( !_isEditable ) {
+                            enableEdit( true );
+                            enableMenuOnMode( _taskMode.get( ) );
+                        } else {
+                            if( _taskMode.isTouched() ) {
+                                if( _canvasView.saveNoteFile() ) {
+                                    _taskMode.set( TaskMode.SAVED ) ;
+                                    enableMenuOnMode( _taskMode.get( ) );
+                                }
+                            }
+                            enableEdit( false );
+                        }
                         hide( );
                     }
                 } );
@@ -191,62 +205,104 @@ public class FullscreenActivity extends AppCompatActivity {
         _new_item = menu.getItem( 0 );
         _load_item = menu.getItem( 1 );
         _save_item = menu.getItem( 2 );
-        enableEdit( true );
+        enableMenuOnMode( _taskMode.get( ) );
+        enableEdit( true ) ;
+
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected( MenuItem item ) {
+        boolean b = false ;
         // Handle item selection
         switch( item.getItemId( ) ) {
-            case R.id.new_item:
-                _canvasView.newNoteFile( );
-                _taskMode.set( TaskMode.CREATE );
-                _new_item.setEnabled( false ) ;
-                enableEdit( true );
-                delayedHide( AUTO_HIDE_DELAY_MILLIS );
-                return true;
+        case R.id.new_item:
+            b = _canvasView.newNoteFile( );
+            if( !b ) return false ;
+            _taskMode.set( TaskMode.CREATE );
+            enableMenuOnMode( TaskMode.CREATE );
+            enableEdit( true );
+            delayedHide( AUTO_HIDE_DELAY_MILLIS );
+            return true;
 
-            case R.id.save_item:
-                _canvasView.saveNoteFile( );
-                enableEdit( false );
-                _taskMode.set( TaskMode.SAVED );
-                delayedHide( AUTO_HIDE_DELAY_MILLIS );
-                return true;
+        case R.id.save_item:
+            b = _canvasView.saveNoteFile( );
+            if( !b ) return false ;
+            enableEdit( false );
+            _taskMode.set( TaskMode.SAVED );
+            enableMenuOnMode( TaskMode.SAVED );
+            delayedHide( AUTO_HIDE_DELAY_MILLIS );
+            return true;
 
-            case R.id.load_item:
-                _canvasView.openFileDialog( );
-                enableEdit( false );
-                _taskMode.set( TaskMode.LOAD );
-                delayedHide( AUTO_HIDE_DELAY_MILLIS );
-                return true;
+        case R.id.load_item:
+            b = _canvasView.openFileDialog( );
+            if( !b ) return false ;
+            enableEdit( false );
+            _taskMode.set( TaskMode.LOAD );
+            enableMenuOnMode( TaskMode.LOAD );
+            delayedHide( AUTO_HIDE_DELAY_MILLIS );
+            return true;
 
-            default:
-                return super.onOptionsItemSelected( item );
+        default:
+            return super.onOptionsItemSelected( item );
         }
     }
-
-    public void enableEdit( boolean b ) {
+    
+    void enableMenuOnMode( final int mode ) {
+        if( mode == TaskMode.CREATE ) {
+            _new_item.setEnabled( false ) ;
+            _load_item.setEnabled( true ) ;
+            _save_item.setEnabled( false ) ;
+        } else if( mode == TaskMode.CREATE_EDIT ) {
+            _new_item.setEnabled( false ) ;
+            _load_item.setEnabled( true ) ;
+            _save_item.setEnabled( false ) ;
+        } else if( mode == TaskMode.CREATE_TOUCHED ) {
+            _new_item.setEnabled( true ) ;
+            _load_item.setEnabled( true ) ;
+            _save_item.setEnabled( true ) ;
+        } else if( mode == TaskMode.LOAD ) {
+            _new_item.setEnabled( true ) ;
+            _load_item.setEnabled( true ) ;
+            _save_item.setEnabled( false ) ;
+        } else if( mode == TaskMode.LOAD_EDIT ) {
+            _new_item.setEnabled( true ) ;
+            _load_item.setEnabled( true ) ;
+            _save_item.setEnabled( false ) ;
+        } else if( mode == TaskMode.LOAD_TOUCHED ) {
+            _new_item.setEnabled( true ) ;
+            _load_item.setEnabled( true ) ;
+            _save_item.setEnabled( true ) ;
+        } else if( mode == TaskMode.SAVED ) {
+            _new_item.setEnabled( true ) ;
+            _load_item.setEnabled( true ) ;
+            _save_item.setEnabled( false ) ;
+        } else if( mode == TaskMode.SAVED_EDIT ) {
+            _new_item.setEnabled( true ) ;
+            _load_item.setEnabled( true ) ;
+            _save_item.setEnabled( false ) ;
+        } else if( mode == TaskMode.SAVED_TOUCHED ) {
+            _new_item.setEnabled( true ) ;
+            _load_item.setEnabled( true ) ;
+            _save_item.setEnabled( true ) ;
+        }
+    }
+    
+    void enableEdit( boolean b ) {
         if( b == true ) {
+            _isEditable = true ;
             _canvasView.setToolTypeAction( _tooltype,
                     SpenSimpleSurfaceView.ACTION_STROKE );
-            _editButton.setEnabled( false );
-            _save_item.setEnabled( true );
-            if( _taskMode.get( ) == TaskMode.CREATE ) {
-                _new_item.setEnabled( false );
-                _taskMode.set( TaskMode.CREATE_EDIT );
-            } else if( _taskMode.get( ) == TaskMode.LOAD ) {
-                _taskMode.set( TaskMode.LOAD_EDIT );
-            } else if( _taskMode.get( ) == TaskMode.SAVED ) {
-                _taskMode.set( TaskMode.SAVED_EDIT );
-            }
+            _editButton.setText("Read");
+            _taskMode.setEdit( ) ;
+            //_editButton.setEnabled( false );
         } else {
+            _isEditable = false ;
             _canvasView.setToolTypeAction( _tooltype,
                     SpenSimpleSurfaceView.ACTION_NONE );
-            _editButton.setEnabled( true );
-            _save_item.setEnabled( false );
+            _editButton.setText("Edit");
+            //_editButton.setEnabled( true );
         }
-
     }
 
     @Override
