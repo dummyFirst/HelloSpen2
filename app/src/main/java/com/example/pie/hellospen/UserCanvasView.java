@@ -253,17 +253,19 @@ class UserCanvasView extends SpenSimpleSurfaceView {
                             _isTouched = false ;
                             _ret = true ;
                         } catch( IOException e ) {
-                            Toast.makeText( _context, "Cannot save NoteDoc file : " + _saveFileName + ".spd.", Toast.LENGTH_SHORT ).show( );
+                            Toast.makeText( _context, "Cannot save NoteDoc file : " +
+                                    _saveFileName + ".spd.", Toast.LENGTH_SHORT ).show( );
                             e.printStackTrace( );
                         } catch( Exception e ) {
                             e.printStackTrace( );
                         }
                     }
-                } ).setNegativeButton( android.R.string.no, new DialogInterface.OnClickListener( ) {
-            @Override
-            public void onClick( DialogInterface dialog, int which ) {
-                dialog.dismiss( );
-            }
+                } )
+            .setNegativeButton( android.R.string.no, new DialogInterface.OnClickListener( ) {
+                @Override
+                public void onClick( DialogInterface dialog, int which ) {
+                    dialog.dismiss( );
+                }
         } ).show( );
 
         return _ret ;
@@ -271,6 +273,7 @@ class UserCanvasView extends SpenSimpleSurfaceView {
 
     void openFileDialog( ) {
         if( _taskMode.isTouched() ) {
+            _d.p("Before : saveNoteFile()") ;
             if( !saveNoteFile( ) ) {
                 return ;
             }
