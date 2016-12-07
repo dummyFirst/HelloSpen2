@@ -17,13 +17,13 @@ class Debug {
     static final int NONE = 0;
     static final int SHOW = 1;
 
-    Debug( Context context ) {
+    Debug( final Context context ) {
         _context = context;
         _mode = SHOW;
         _prefix = null ;
     }
 
-    Debug( Context context, int mode ) {
+    Debug( final Context context, final int mode ) {
         _context = context;
         _mode = mode;
     }
@@ -44,16 +44,19 @@ class Debug {
         p( prefix + msg );
     }
 
-    void set( int mode ) {
+    void set( final int mode ) {
         _mode = mode;
     }
 
-    void setPrefix( String prefix ) {
+    void setPrefix( final String prefix ) {
         _prefix = prefix;
     }
 
     void i( final String msg ) {
+        String str = "" ;
         if( _mode == NONE ) return;
-        Log.i( _tag, msg) ;
+        if( _prefix != null )  str += _prefix ;
+        str += msg ;
+        Log.i( _tag, str ) ;
     }
 }

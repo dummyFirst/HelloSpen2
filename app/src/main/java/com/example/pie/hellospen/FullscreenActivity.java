@@ -117,6 +117,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
     TaskMode _taskMode;
     boolean _isEditable ;
+    Debug _i ;
 
     public boolean isSpenFeatureEnabled( ) {
         return _isSpenFeatureEnabled;
@@ -126,6 +127,8 @@ public class FullscreenActivity extends AppCompatActivity {
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_fullscreen );
+
+        _i = new Debug("dummy1", Debug.SHOW) ;
 
         _isEditable = false ;
         mVisible = true;
@@ -152,7 +155,9 @@ public class FullscreenActivity extends AppCompatActivity {
                                 }
                             }
                             enableEdit( false );
+                            _taskMode.diableEdit();
                         }
+                        _i.i("_editButton : TaskMode = " + _taskMode.getString()) ;
                         hide( );
                     }
                 } );
@@ -207,8 +212,8 @@ public class FullscreenActivity extends AppCompatActivity {
         _save_item = menu.getItem( 2 );
         enableMenuOnMode( _taskMode.get( ) );
         enableEdit( true ) ;
-
-        return true;
+        _i.i("_editButton : TaskMode = " + _taskMode.getString()) ;
+        return super.onCreateOptionsMenu( menu ) ;
     }
 
     @Override
@@ -217,29 +222,27 @@ public class FullscreenActivity extends AppCompatActivity {
         // Handle item selection
         switch( item.getItemId( ) ) {
         case R.id.new_item:
+            _i.i("new_item") ;
             b = _canvasView.newNoteFile( );
             if( !b ) return false ;
             _taskMode.set( TaskMode.CREATE );
             enableMenuOnMode( TaskMode.CREATE );
             enableEdit( true );
+            _i.i("new_item : TaskMode = " + _taskMode.getString()) ;
             delayedHide( AUTO_HIDE_DELAY_MILLIS );
             return true;
 
         case R.id.save_item:
-            b = _canvasView.saveNoteFile( );
-            if( !b ) return false ;
-            enableEdit( false );
-            _taskMode.set( TaskMode.SAVED );
-            enableMenuOnMode( TaskMode.SAVED );
+            _i.i("save_item") ;
+            _canvasView.saveNoteFile( );
+
             delayedHide( AUTO_HIDE_DELAY_MILLIS );
             return true;
 
         case R.id.load_item:
-            b = _canvasView.openFileDialog( );
-            if( !b ) return false ;
-            enableEdit( false );
-            _taskMode.set( TaskMode.LOAD );
-            enableMenuOnMode( TaskMode.LOAD );
+            _i.i("load_item") ;
+            _canvasView.openFileDialog( );
+
             delayedHide( AUTO_HIDE_DELAY_MILLIS );
             return true;
 

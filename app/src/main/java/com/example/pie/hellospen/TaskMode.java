@@ -129,4 +129,15 @@ class TaskMode {
 
         return b ;
     }
+
+    void diableEdit( ) {
+        if( _mode == CREATE_EDIT ) {
+            set( CREATE );
+        } else if( _mode == LOAD_EDIT ) {
+            set( LOAD );
+        } else if( _mode == SAVED_EDIT ) {
+            set( SAVED );
+        }
+    }
+
 }
