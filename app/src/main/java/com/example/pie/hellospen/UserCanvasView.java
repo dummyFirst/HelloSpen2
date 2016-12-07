@@ -138,7 +138,7 @@ class UserCanvasView extends SpenSimpleSurfaceView {
                     if( _taskMode.isEdit() ) {
                         _taskMode.setTouched() ;
                         activity.enableMenuOnMode( _taskMode.get() );
-                        _d.i( "UserCanvasView.onTouch : TaskMode = " + _taskMode.getString() ) ;
+                        _i.i( "UserCanvasView.onTouch : TaskMode = " + _taskMode.getString() ) ;
                     }
                 }
                 return false;
@@ -166,15 +166,16 @@ class UserCanvasView extends SpenSimpleSurfaceView {
     }
 
     boolean newNoteFile( ) {
-        FullscreenActivity activity = ( FullscreenActivity ) _context;
+        _i.i( "newNoteFile() start" ) ;
         if( _isTouched ) {
-            if( !saveNoteFile( ) ) {
-                return false ;
+            saveNoteFile() ;
+            if( _ret ) {
+                _curFilePath = "" ;
+                _ret = false ;
             } else {
-
+                return false;
             }
         }
-        _i.i( "newNoteFile() start" ) ;
 
         // Clear _noteDoc
         if( _noteDoc != null ) {
@@ -192,10 +193,10 @@ class UserCanvasView extends SpenSimpleSurfaceView {
         } catch( IOException e ) {
             Toast.makeText( _context, "Cannot create new NoteDoc.", Toast.LENGTH_SHORT ).show( );
             e.printStackTrace( );
-            activity.finish( );
+            _activity.finish( );
         } catch( Exception e ) {
             e.printStackTrace( );
-            activity.finish( );
+            _activity.finish( );
         }
 
         // Add a Page to NoteDoc, get an instance, and set it to the member variable.
@@ -208,28 +209,31 @@ class UserCanvasView extends SpenSimpleSurfaceView {
         setPageDoc( _notePage, true );
         _isTouched = false ;
 
-        _d.i( "newNoteFile( ) end" ) ;
+        _taskMode.set( TaskMode.CREATE );
+        _activity.enableMenuOnMode( TaskMode.CREATE );
+        _activity.enableEdit( true );
+        _i.i( "newNoteFile() end : TaskMode = " + _taskMode.getString() );
+
         return true ;
     }
 
     boolean saveNoteFile( ) {
-        _i.i( "saveNoteFile() start : TaskMode = " + _taskMode.get() ) ;
+        _i.i( "saveNoteFile() start : TaskMode = " + _taskMode.getString() ) ;
         int taskMode = _taskMode.get( );
         if( taskMode == TaskMode.CREATE_TOUCHED || _curFilePath.length() == 0 ) {
             _saveFileName = Utils.getTimeFileName( );
         } else if( taskMode == TaskMode.LOAD_TOUCHED ) {
             _saveFileName = _curFilePath.substring( _curFilePath.lastIndexOf( "/" ) + 1,
-                    _curFilePath.lastIndexOf( "." ) - 1 );
+                    _curFilePath.lastIndexOf( "." ) );
         } else if( taskMode == TaskMode.SAVED_TOUCHED ) {
             _saveFileName = _curFilePath.substring( _curFilePath.lastIndexOf( "/" ) + 1,
-                    _curFilePath.lastIndexOf( "." ) - 1 );
+                    _curFilePath.lastIndexOf( "." ) );
         }
         _i.i( "_curFilePath : " + _curFilePath + "\n" +
             "_saveFileName : " + _saveFileName + "\n" +
                 "TaskMode : " + _taskMode.getString( ) ) ;
 
 
-        final FullscreenActivity activity = (FullscreenActivity)_context;
         _ret = false ;
 
         // Prompt Save File dialog to get the file name
@@ -238,9 +242,9 @@ class UserCanvasView extends SpenSimpleSurfaceView {
         final View layout = inflater.inflate( R.layout.save_file_dialog,
                 ( ViewGroup ) findViewById( R.id.layout_root ) );
 
-        AlertDialog.Builder dlg = new AlertDialog.Builder( activity );
+        AlertDialog.Builder dlg = new AlertDialog.Builder( _activity );
         dlg.setView( layout );
-        dlg.setIcon(  activity.getResources( ).getDrawable( android.R.drawable.ic_dialog_alert ) );
+        dlg.setIcon( _activity.getResources( ).getDrawable( android.R.drawable.ic_dialog_alert ) );
 
         final String fileName = _saveFileName;
 
@@ -257,15 +261,17 @@ class UserCanvasView extends SpenSimpleSurfaceView {
                             _noteDoc.save( _dir.getAbsolutePath( ) + "/" +
                                     inputPath.getText( ) + ".spd", false );
 
-                            _curFilePath = _dir.getAbsolutePath( ) + inputPath.getText( ) + ".spd";
+                            _ret = true ;
+                            _curFilePath = _dir.getAbsolutePath( ) + "/" + inputPath.getText( ) + ".spd";
                             Toast.makeText( _context, "Save success to " + inputPath.getText() + ".spd",
                                     Toast.LENGTH_SHORT ).show( );
                             _isTouched = false ;
-                            activity.enableEdit( false );
+
+                            _activity.enableEdit( false );
                             _taskMode.set( TaskMode.SAVED );
-                            activity.enableMenuOnMode( TaskMode.SAVED );
-                            _i.i("save_item : TaskMode = " + _taskMode.getString()) ;
-                            _ret = true ;
+                            _activity.enableMenuOnMode( TaskMode.SAVED );
+                            _i.i("saveNoteFile() -> dialog : TaskMode = " + _taskMode.getString()) ;
+
                         } catch( IOException e ) {
                             Toast.makeText( _context, "Cannot save NoteDoc file : " +
                                     _saveFileName + ".spd.", Toast.LENGTH_SHORT ).show( );
@@ -282,20 +288,21 @@ class UserCanvasView extends SpenSimpleSurfaceView {
                 }
         } ).show( );
 
-        _i.i( "saveNoteFile() end");
+        _i.i( "saveNoteFile() end : TaskMode = " + _taskMode.getString() );
         return _ret ;
     }
 
     boolean openFileDialog( ) {
+        _i.i("openFileDialog start") ;
         if( _taskMode.isTouched() ) {
-            if( !saveNoteFile( ) ) {
-                return false ;
+            saveNoteFile( ) ;
+            if( _ret ) {
+                _ret = false ;
             } else {
-
+                return false ;
             }
         }
 
-        _i.i("openFileDialog start") ;
         // Load the file list.
         final String[] fileList = Utils.setFileList( _dir, _context );
         if( fileList == null ) {
@@ -316,13 +323,13 @@ class UserCanvasView extends SpenSimpleSurfaceView {
                     _activity.enableEdit( false );
                     _taskMode.set( TaskMode.LOAD );
                     _activity.enableMenuOnMode( TaskMode.LOAD );
-                    _i.i( "load_item : TaskMode = " + _taskMode.getString( ) );
+                    _i.i( "openFileDialg -> dialog : TaskMode = " + _taskMode.getString( ) );
                 }
         } );
 
         dialog.show( );
 
-        _i.i("openFileDialog end") ;
+
         return true ;
     }
 

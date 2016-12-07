@@ -222,25 +222,17 @@ public class FullscreenActivity extends AppCompatActivity {
         // Handle item selection
         switch( item.getItemId( ) ) {
         case R.id.new_item:
-            _i.i("new_item") ;
-            b = _canvasView.newNoteFile( );
-            if( !b ) return false ;
-            _taskMode.set( TaskMode.CREATE );
-            enableMenuOnMode( TaskMode.CREATE );
-            enableEdit( true );
-            _i.i("new_item : TaskMode = " + _taskMode.getString()) ;
+            _canvasView.newNoteFile( );
             delayedHide( AUTO_HIDE_DELAY_MILLIS );
             return true;
 
         case R.id.save_item:
-            _i.i("save_item") ;
             _canvasView.saveNoteFile( );
 
             delayedHide( AUTO_HIDE_DELAY_MILLIS );
             return true;
 
         case R.id.load_item:
-            _i.i("load_item") ;
             _canvasView.openFileDialog( );
 
             delayedHide( AUTO_HIDE_DELAY_MILLIS );

@@ -36,7 +36,7 @@ class TaskMode {
 
     void set( final int taskMode ) {
         _mode = taskMode;
-        _debug.p( "TaskMode : " +  _mode ) ;
+        _debug.p( "TaskMode : " +  getString() ) ;
     }
 
     /*
@@ -52,7 +52,7 @@ class TaskMode {
         } else {
             _debug.p( "setTouched : _mode is not ~_EDIT" ) ;
         }
-        _debug.p( "TaskMode : " +  _mode ) ;
+        _debug.p( "TaskMode : " +  getString( ) ) ;
     }
 
     void setEdit( ) {
@@ -65,7 +65,7 @@ class TaskMode {
         } else {
             _debug.p( "setTouched : _mode is NOT first" ) ;
         }
-        _debug.p( "TaskMode : " +  _mode ) ;
+        _debug.p( "TaskMode : " +  getString() ) ;
     }
     
     String getString( ) {
