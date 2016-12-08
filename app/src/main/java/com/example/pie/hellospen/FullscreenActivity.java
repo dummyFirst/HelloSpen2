@@ -65,9 +65,7 @@ public class FullscreenActivity extends AppCompatActivity {
             return false;
         }
     };
-    MenuItem _new_item;
-    MenuItem _load_item;
-    MenuItem _save_item;
+
     private View mControlsView;
     private final Runnable mShowPart2Runnable = new Runnable( ) {
         @Override
@@ -115,9 +113,15 @@ public class FullscreenActivity extends AppCompatActivity {
     private Button _editButton;
     private boolean _isSpenFeatureEnabled;
 
+    MenuItem _new_item;
+    MenuItem _load_item;
+    MenuItem _save_item;
+
     TaskMode _taskMode;
     boolean _isEditable ;
     Debug _i ;
+
+    String _curFileName ;
 
     public boolean isSpenFeatureEnabled( ) {
         return _isSpenFeatureEnabled;
@@ -139,7 +143,7 @@ public class FullscreenActivity extends AppCompatActivity {
         // while interacting with the UI.
         //findViewById(R.id.edit_button).se tOnTouchListener(mDelayHideTouchListener);
         //**
-        _editButton = ( Button ) findViewById( R.id.edit_button );
+        _editButton = ( Button )findViewById( R.id.edit_button );
         _editButton.setOnClickListener(
                 new View.OnClickListener( ) {
                     @Override
@@ -149,11 +153,9 @@ public class FullscreenActivity extends AppCompatActivity {
                             enableMenuOnMode( _taskMode.get( ) );
                         } else {
                             if( _taskMode.isTouched() ) {
-                                if( _canvasView.saveNoteFile() ) {
-                                    _taskMode.set( TaskMode.SAVED ) ;
-                                    enableMenuOnMode( _taskMode.get( ) );
-                                }
+                                _canvasView.saveNoteFile( ) ;
                             }
+
                             enableEdit( false );
                             _taskMode.diableEdit();
                         }
@@ -228,13 +230,11 @@ public class FullscreenActivity extends AppCompatActivity {
 
         case R.id.save_item:
             _canvasView.saveNoteFile( );
-
             delayedHide( AUTO_HIDE_DELAY_MILLIS );
             return true;
 
         case R.id.load_item:
             _canvasView.openFileDialog( );
-
             delayedHide( AUTO_HIDE_DELAY_MILLIS );
             return true;
 

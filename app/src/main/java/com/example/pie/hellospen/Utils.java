@@ -6,6 +6,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.samsung.android.sdk.SsdkUnsupportedException;
@@ -13,8 +17,11 @@ import com.samsung.android.sdk.pen.Spen;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
 /**
  * Created by pie on 16. 11. 22.
@@ -156,5 +163,6 @@ class Utils {
             return ( name.endsWith( ".spd" ) || name.endsWith( ".png" ) );
         }
     }
+
 
 }

@@ -1,0 +1,12 @@
+	AutoSave
+
+- rename saveNoteFile() to saveNoteFile_Dialog()
+
+- add saveNoteFile() which excludes dialog.
+
+- If( taskMode == CREATE_TOUCHED )
+   call saveNoteFile_Dialog() ;
+   * set the current file name.
+
+      
+			
