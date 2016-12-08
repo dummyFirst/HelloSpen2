@@ -52,6 +52,10 @@ class Debug {
         _prefix = prefix;
     }
 
+    int getMode( ) {
+        return _mode ;
+    }
+
     void i( final String msg ) {
         String str = "" ;
         if( _mode == NONE ) return;

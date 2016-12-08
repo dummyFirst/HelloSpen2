@@ -1,0 +1,4 @@
+[ process result of Dialog selection ]
+- create IncomingHandler.java
+- add processMessage( ) in UserCanvasView
+

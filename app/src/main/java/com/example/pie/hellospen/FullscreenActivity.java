@@ -85,10 +85,7 @@ public class FullscreenActivity extends AppCompatActivity {
             hide( );
         }
     };
-    private Context _context;
-    //**private SpenSimpleSurfaceView _canvasView;
-    private UserCanvasView _canvasView;
-    //**private Button saveButton ;
+
     //private View mContentView;
     private final Runnable mHidePart2Runnable = new Runnable( ) {
         @SuppressLint("InlinedApi")
@@ -108,6 +105,10 @@ public class FullscreenActivity extends AppCompatActivity {
                     | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION );
         }
     };
+
+    Context _context;
+    //**private SpenSimpleSurfaceView _canvasView;
+    UserCanvasView _canvasView;
 
     private int _tooltype;
     private Button _editButton;
@@ -133,7 +134,7 @@ public class FullscreenActivity extends AppCompatActivity {
         setContentView( R.layout.activity_fullscreen );
 
         _i = new Debug("dummy1", Debug.SHOW) ;
-
+        _i.i( "*******************************************************************************" ) ;
         _isEditable = false ;
         mVisible = true;
         mControlsView = findViewById( R.id.fullscreen_content_controls );
@@ -253,8 +254,8 @@ public class FullscreenActivity extends AppCompatActivity {
             _load_item.setEnabled( true ) ;
             _save_item.setEnabled( false ) ;
         } else if( mode == TaskMode.CREATE_TOUCHED ) {
-            _new_item.setEnabled( true ) ;
-            _load_item.setEnabled( true ) ;
+            _new_item.setEnabled( false) ;
+            _load_item.setEnabled( false ) ;
             _save_item.setEnabled( true ) ;
         } else if( mode == TaskMode.LOAD ) {
             _new_item.setEnabled( true ) ;
@@ -265,8 +266,8 @@ public class FullscreenActivity extends AppCompatActivity {
             _load_item.setEnabled( true ) ;
             _save_item.setEnabled( false ) ;
         } else if( mode == TaskMode.LOAD_TOUCHED ) {
-            _new_item.setEnabled( true ) ;
-            _load_item.setEnabled( true ) ;
+            _new_item.setEnabled( false ) ;
+            _load_item.setEnabled( false ) ;
             _save_item.setEnabled( true ) ;
         } else if( mode == TaskMode.SAVED ) {
             _new_item.setEnabled( true ) ;
@@ -277,8 +278,8 @@ public class FullscreenActivity extends AppCompatActivity {
             _load_item.setEnabled( true ) ;
             _save_item.setEnabled( false ) ;
         } else if( mode == TaskMode.SAVED_TOUCHED ) {
-            _new_item.setEnabled( true ) ;
-            _load_item.setEnabled( true ) ;
+            _new_item.setEnabled( false ) ;
+            _load_item.setEnabled( false ) ;
             _save_item.setEnabled( true ) ;
         }
     }
