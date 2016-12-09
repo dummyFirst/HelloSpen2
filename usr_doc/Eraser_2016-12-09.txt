@@ -1,0 +1,9 @@
+Eraser 
+
+- add the task mode Eraser
+- add the button eraser_button
+- Eraser
+   * ERASER_EDIT
+   * on ERASER_EDIT, ERASER_TOUCHED
+      ** eraser_button focused
+   * ERASER_TOUCHED

@@ -19,7 +19,9 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.samsung.android.sdk.SsdkUnsupportedException;
@@ -66,8 +68,10 @@ class UserCanvasView extends SpenSimpleSurfaceView {
     Debug _i;
 
     IncomingHandler _handler ;
+    Button _eraserButton ;
 
-    public UserCanvasView( Context context ) {
+
+    UserCanvasView( Context context ) {
         super( context );
         _context = context;
         _activity = (FullscreenActivity)_context;
@@ -81,7 +85,7 @@ class UserCanvasView extends SpenSimpleSurfaceView {
         _handler = new IncomingHandler( _activity ) ;
     }
 
-    public void initialize( ) {
+    void initialize( ) {
 
         final FullscreenActivity activity = (FullscreenActivity)_context;
         _taskMode = activity._taskMode;
@@ -149,6 +153,14 @@ class UserCanvasView extends SpenSimpleSurfaceView {
                     }
                 }
                 return false;
+            }
+        } );
+
+        _eraserButton = (Button) findViewById(R.id.eraser_button);
+        _eraserButton.setOnClickListener( new OnClickListener( ) {
+            @Override
+            public void onClick( View v ) {
+
             }
         } );
 
