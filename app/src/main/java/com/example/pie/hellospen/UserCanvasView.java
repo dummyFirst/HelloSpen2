@@ -72,7 +72,7 @@ class UserCanvasView extends SpenSimpleSurfaceView {
 
     IncomingHandler _handler;
 
-    RelativeLayout _canvasLayout;
+    int _strokeCount ;
 
 
     UserCanvasView( Context context ) {
@@ -87,6 +87,8 @@ class UserCanvasView extends SpenSimpleSurfaceView {
         _i = new Debug ( "dummy1", Debug.SHOW );
 
         _handler = new IncomingHandler ( _activity );
+
+        _strokeCount = 0 ;
     }
 
     void initialize() {
@@ -156,6 +158,23 @@ class UserCanvasView extends SpenSimpleSurfaceView {
             }
         } );
 
+        _notePage.setHistoryListener( new SpenPageDoc.HistoryListener( ) {
+            @Override
+            public void onCommit( SpenPageDoc spenPageDoc ) {
+                ++ _strokeCount ;
+                _i.i("_strokeCount : " + _strokeCount) ;
+            }
+
+            @Override
+            public void onUndoable( SpenPageDoc spenPageDoc, boolean b ) {
+
+            }
+
+            @Override
+            public void onRedoable( SpenPageDoc spenPageDoc, boolean b ) {
+
+            }
+        } );
 
         // Set the save directory for the file.
         _dir = new File ( Environment.getExternalStorageDirectory ().getAbsolutePath () + "/SPen/" );
