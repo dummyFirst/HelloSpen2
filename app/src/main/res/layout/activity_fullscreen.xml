@@ -31,15 +31,13 @@
             tools:ignore="UselessParent">
             <Button
                 android:id="@+id/edit_button"
-                style="?metaButtonBarButtonStyle"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Edit" />
             <Button
                 android:id="@+id/eraser_button"
-                style="?metaButtonBarButtonStyle"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Eraser" />

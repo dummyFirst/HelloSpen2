@@ -144,13 +144,12 @@ class UserCanvasView extends SpenSimpleSurfaceView {
         setTouchListener ( new SpenTouchListener () {
             @Override
             public boolean onTouch( View view, MotionEvent motionEvent ) {
-                if ( motionEvent.getToolType ( 0 ) == SpenSimpleSurfaceView.TOOL_SPEN && motionEvent.getAction () == MotionEvent.ACTION_UP ) {
+                if ( motionEvent.getToolType ( 0 ) == SpenSimpleSurfaceView.TOOL_SPEN &&
+                        motionEvent.getAction () == MotionEvent.ACTION_UP ) {
                     _isTouched = true;
-
                     if ( _taskMode.isEdit () ) {
                         _taskMode.setTouched ();
                         activity.enableMenuOnMode ( _taskMode.get () );
-                        _i.i ( "UserCanvasView.onTouch : TaskMode = " + _taskMode.getString () );
                     }
                 }
                 return false;

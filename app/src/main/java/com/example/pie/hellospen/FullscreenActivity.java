@@ -209,8 +209,8 @@ public class FullscreenActivity extends AppCompatActivity {
                     Toast.LENGTH_SHORT ).show( );
             finish( );
         }
-        _canvasView.initialize( );
         _spenViewLayout.addView( _canvasView );
+        _canvasView.initialize( );
 
         initSettingInfo( ) ;
 
@@ -388,11 +388,12 @@ public class FullscreenActivity extends AppCompatActivity {
         penInfo.size = 10;
         _canvasView.setPenSettingInfo( penInfo );
 
+
         // Initialize Eraser Setting
-        _eraserSetting = new SpenSettingEraserLayout (getApplicationContext (), "", _spenViewLayout) ;
+        _eraserSetting = new SpenSettingEraserLayout ( this, "", _spenViewLayout) ;
         _eraserSetting.setCanvasView ( _canvasView );
         SpenSettingEraserInfo eraserInfo = new SpenSettingEraserInfo( ) ;
-        eraserInfo.size = 10 ;
+        eraserInfo.size = 40 ;
         _canvasView.setEraserSettingInfo ( eraserInfo );
         _eraserSetting.setInfo ( eraserInfo );
 
@@ -409,13 +410,15 @@ public class FullscreenActivity extends AppCompatActivity {
         @Override
         public void onClick( View view ) {
             if( _taskMode.isEraserOn () ) {
+                _eraserButton.setSelected ( false );
                 _taskMode.diableEraser ();
                 _canvasView.setToolTypeAction ( SpenSimpleSurfaceView.TOOL_SPEN,
                         SpenSimpleSurfaceView.ACTION_STROKE );
             } else {
+                _eraserButton.setSelected ( true );
                 _taskMode.enableEraser ();
-                _canvasView.setToolTypeAction ( SpenSimpleSurfaceView.TOOL_ERASER,
-                        SpenSimpleSurfaceView.ACTION_ERASER );
+                _canvasView.setToolTypeAction ( SpenSimpleSurfaceView.TOOL_SPEN,
+                        SpenSimpleSurfaceView.ACTION_ERASER ) ;
 
             }
         }
