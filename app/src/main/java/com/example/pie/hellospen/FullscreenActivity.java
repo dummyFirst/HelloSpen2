@@ -2,6 +2,7 @@ package com.example.pie.hellospen;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Environment;
 import android.support.v7.app.ActionBar;
@@ -14,14 +15,18 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.samsung.android.sdk.SsdkUnsupportedException;
 import com.samsung.android.sdk.pen.Spen;
+import com.samsung.android.sdk.pen.SpenSettingEraserInfo;
+import com.samsung.android.sdk.pen.SpenSettingPenInfo;
 import com.samsung.android.sdk.pen.document.SpenNoteDoc;
 import com.samsung.android.sdk.pen.document.SpenPageDoc;
 import com.samsung.android.sdk.pen.engine.SpenSimpleSurfaceView;
+import com.samsung.android.sdk.pen.settingui.SpenSettingEraserLayout;
 
 import java.io.File;
 
@@ -122,7 +127,11 @@ public class FullscreenActivity extends AppCompatActivity {
     boolean _isEditable ;
     Debug _i ;
 
-    String _curFileName ;
+    RelativeLayout _spenViewLayout ;
+    Button _eraserButton ;
+
+    SpenSettingEraserLayout _eraserSetting ;
+    FrameLayout _buttonContainer ;
 
     public boolean isSpenFeatureEnabled( ) {
         return _isSpenFeatureEnabled;
@@ -188,8 +197,10 @@ public class FullscreenActivity extends AppCompatActivity {
             finish( );
         }
 
+        _buttonContainer = (FrameLayout)findViewById ( R.id.button_container ) ;
+
         // Create Spen View
-        RelativeLayout spenViewLayout =
+        _spenViewLayout =
                 ( RelativeLayout ) findViewById( R.id.spenViewLayout );
         //**
         _canvasView = new UserCanvasView( _context );
@@ -198,8 +209,10 @@ public class FullscreenActivity extends AppCompatActivity {
                     Toast.LENGTH_SHORT ).show( );
             finish( );
         }
-        spenViewLayout.addView( _canvasView );
         _canvasView.initialize( );
+        _spenViewLayout.addView( _canvasView );
+
+        initSettingInfo( ) ;
 
         _taskMode.set( TaskMode.CREATE );
 
@@ -292,12 +305,14 @@ public class FullscreenActivity extends AppCompatActivity {
             _editButton.setText("Read");
             _taskMode.setEdit( ) ;
             //_editButton.setEnabled( false );
+            _eraserButton.setEnabled ( true );
         } else {
             _isEditable = false ;
             _canvasView.setToolTypeAction( _tooltype,
                     SpenSimpleSurfaceView.ACTION_NONE );
             _editButton.setText("Edit");
             //_editButton.setEnabled( true );
+            _eraserButton.setEnabled ( false );
         }
     }
 
@@ -366,5 +381,44 @@ public class FullscreenActivity extends AppCompatActivity {
 
     }
 
+    private void initSettingInfo( ) {
+        //**Change the pen info.
+        SpenSettingPenInfo penInfo = new SpenSettingPenInfo( );
+        penInfo.color = Color.BLACK;
+        penInfo.size = 10;
+        _canvasView.setPenSettingInfo( penInfo );
+
+        // Initialize Eraser Setting
+        _eraserSetting = new SpenSettingEraserLayout (getApplicationContext (), "", _spenViewLayout) ;
+        _eraserSetting.setCanvasView ( _canvasView );
+        SpenSettingEraserInfo eraserInfo = new SpenSettingEraserInfo( ) ;
+        eraserInfo.size = 10 ;
+        _canvasView.setEraserSettingInfo ( eraserInfo );
+        _eraserSetting.setInfo ( eraserInfo );
+
+        _buttonContainer.addView ( _eraserSetting );
+
+        _eraserButton = (Button)findViewById ( R.id.eraser_button ) ;
+        _eraserButton.setOnClickListener ( _eraserClick );
+
+        _canvasView.setToolTipEnabled ( true );
+
+    }
+
+    private final View.OnClickListener _eraserClick = new View.OnClickListener () {
+        @Override
+        public void onClick( View view ) {
+            if( _taskMode.isEraserOn () ) {
+                _taskMode.diableEraser ();
+                _canvasView.setToolTypeAction ( SpenSimpleSurfaceView.TOOL_SPEN,
+                        SpenSimpleSurfaceView.ACTION_STROKE );
+            } else {
+                _taskMode.enableEraser ();
+                _canvasView.setToolTypeAction ( SpenSimpleSurfaceView.TOOL_ERASER,
+                        SpenSimpleSurfaceView.ACTION_ERASER );
+
+            }
+        }
+    } ;
 
 }//**End FullscreenActivity
