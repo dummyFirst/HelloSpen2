@@ -3,6 +3,9 @@ package com.example.pie.hellospen;
 import android.app.Activity;
 import android.content.Context;
 
+import com.samsung.android.sdk.pen.SpenSettingViewInterface;
+import com.samsung.android.sdk.pen.engine.SpenSimpleSurfaceView;
+
 /**
  * Created by young on 2016-11-26.
  */
@@ -45,6 +48,16 @@ class TaskMode {
 
     void set( final int taskMode ) {
         _mode = taskMode;
+
+        final SpenSimpleSurfaceView canvasView = ( ( FullscreenActivity ) _context )._canvasView;
+        if( isTouched() ) {
+            if( canvasView.getToolTypeAction(
+                    SpenSettingViewInterface.TOOL_SPEN ) == SpenSimpleSurfaceView.ACTION_STROKE )
+                canvasView.setToolTipEnabled( false );
+        } else {
+            canvasView.setToolTipEnabled( true );
+        }
+
         _i.i( "TaskMode : " +  getString() ) ;
     }
 
@@ -201,5 +214,8 @@ class TaskMode {
         set( _oldMode ) ;
     }
 
+    int getOldMode( ) {
+        return _oldMode ;
+    }
 
 }
