@@ -34,11 +34,13 @@ class TaskMode {
     
     Context _context ;
     Debug _i ;
+    FullscreenActivity _activity ;
 
     TaskMode( final Context context ) {
         _mode = NONE;
         _oldMode = NONE ;
         _context = context ;
+        _activity = (FullscreenActivity)_context ;
         _i = new Debug( "dummy1", Debug.SHOW ) ;
     }
 
@@ -49,7 +51,8 @@ class TaskMode {
     void set( final int taskMode ) {
         _mode = taskMode;
 
-        final SpenSimpleSurfaceView canvasView = ( ( FullscreenActivity ) _context )._canvasView;
+        final SpenSimpleSurfaceView canvasView =
+                ( ( FullscreenActivity ) _context )._canvasView;
         if( isTouched() ) {
             if( canvasView.getToolTypeAction(
                     SpenSettingViewInterface.TOOL_SPEN ) == SpenSimpleSurfaceView.ACTION_STROKE )
@@ -65,6 +68,8 @@ class TaskMode {
         edit, touched
      */
     void setTouched( ) {
+        if( isTouched() ) return ;
+
         if( _mode == CREATE_EDIT ) {
             set( CREATE_TOUCHED );
         } else if( _mode == LOAD_EDIT ) {
@@ -97,7 +102,7 @@ class TaskMode {
         } else if( _mode == SAVED ) {
             set( SAVED_EDIT ) ;
         } else {
-            _i.i( "setTouched : _mode is NOT first" ) ;
+            _i.i( "setEdit : _mode is NOT first" ) ;
         }
     }
     

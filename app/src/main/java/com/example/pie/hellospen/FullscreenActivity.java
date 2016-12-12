@@ -133,6 +133,9 @@ public class FullscreenActivity extends AppCompatActivity {
     SpenSettingEraserLayout _eraserSetting ;
     FrameLayout _buttonContainer ;
 
+    Button _undoButton ;
+    Button _redoButton ;
+
     public boolean isSpenFeatureEnabled( ) {
         return _isSpenFeatureEnabled;
     }
@@ -214,10 +217,16 @@ public class FullscreenActivity extends AppCompatActivity {
 
         initSettingInfo( ) ;
 
+        _undoButton = (Button)findViewById( R.id.undo_button ) ;
+        _redoButton = (Button)findViewById( R.id.redo_button ) ;
+        _undoButton.setOnClickListener( _undoNredoClick );
+        _redoButton.setOnClickListener( _undoNredoClick );
+        _undoButton.setEnabled( _canvasView._notePage.isUndoable() );
+        _redoButton.setEnabled( _canvasView._notePage.isRedoable() );
+
         _taskMode.set( TaskMode.CREATE );
 
     }
-
 
     public boolean onCreateOptionsMenu( Menu menu ) {
         MenuInflater inflater = getMenuInflater( );
@@ -420,6 +429,29 @@ public class FullscreenActivity extends AppCompatActivity {
                 _canvasView.setToolTypeAction ( SpenSimpleSurfaceView.TOOL_SPEN,
                         SpenSimpleSurfaceView.ACTION_ERASER ) ;
 
+            }
+        }
+    } ;
+
+    private final View.OnClickListener _undoNredoClick = new View.OnClickListener( ) {
+        @Override
+        public void onClick( View v ) {
+            if( _canvasView._notePage == null ) return ;
+            if( v.equals( _undoButton ) ) {
+                if( _canvasView._notePage.isUndoable() ) {
+                    SpenPageDoc.HistoryUpdateInfo[ ] data =
+                            _canvasView._notePage.undo( ) ;
+                    _canvasView.updateUndo( data );
+                    if( !_taskMode.isTouched() ) _taskMode.setTouched();
+                    _i.i( "HistoryUpdateInfo : " + data.length ) ;
+                }
+            } else if( v.equals( _redoButton ) ) {
+                if( _canvasView._notePage.isRedoable() ) {
+                    SpenPageDoc.HistoryUpdateInfo[ ] data =
+                            _canvasView._notePage.redo() ;
+                    _canvasView.updateRedo( data );
+                    _i.i( "HistoryUpdateInfo : " + data.length ) ;
+                }
             }
         }
     } ;

@@ -52,8 +52,8 @@ import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 class UserCanvasView extends SpenSimpleSurfaceView {
     private Context _context;
     private FullscreenActivity _activity;
-    private SpenNoteDoc _noteDoc;
-    private SpenPageDoc _notePage;
+    SpenNoteDoc _noteDoc;
+    SpenPageDoc _notePage;
     private Rect _screenRect;
     private boolean _isSpenFeatureEnabled;
     private int _tooltype;
@@ -158,23 +158,7 @@ class UserCanvasView extends SpenSimpleSurfaceView {
             }
         } );
 
-        _notePage.setHistoryListener( new SpenPageDoc.HistoryListener( ) {
-            @Override
-            public void onCommit( SpenPageDoc spenPageDoc ) {
-                ++ _strokeCount ;
-                _i.i("_strokeCount : " + _strokeCount) ;
-            }
-
-            @Override
-            public void onUndoable( SpenPageDoc spenPageDoc, boolean b ) {
-
-            }
-
-            @Override
-            public void onRedoable( SpenPageDoc spenPageDoc, boolean b ) {
-
-            }
-        } );
+        _notePage.setHistoryListener( _historyListener );
 
         // Set the save directory for the file.
         _dir = new File ( Environment.getExternalStorageDirectory ().getAbsolutePath () + "/SPen/" );
@@ -250,6 +234,7 @@ class UserCanvasView extends SpenSimpleSurfaceView {
         _taskMode.set ( TaskMode.CREATE );
         _activity.enableMenuOnMode ( TaskMode.CREATE );
         _activity.enableEdit ( true );
+
         _i.i ( "newNoteFile() end : TaskMode = " + _taskMode.getString () );
 
         return true;
@@ -489,6 +474,24 @@ class UserCanvasView extends SpenSimpleSurfaceView {
         printFileMode ();
         _i.i ( "processMessage end" );
     }
+
+    private final SpenPageDoc.HistoryListener _historyListener = new SpenPageDoc.HistoryListener( ) {
+        @Override
+        public void onCommit( SpenPageDoc spenPageDoc ) {
+            ++ _strokeCount ;
+            _i.i("_strokeCount : " + _strokeCount) ;
+        }
+
+        @Override
+        public void onUndoable( SpenPageDoc spenPageDoc, boolean b ) {
+            _activity._undoButton.setEnabled( b );
+        }
+
+        @Override
+        public void onRedoable( SpenPageDoc spenPageDoc, boolean b ) {
+            _activity._redoButton.setEnabled( b );
+        }
+    } ;
 
 }
 
