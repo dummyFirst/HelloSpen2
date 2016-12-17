@@ -112,7 +112,6 @@ public class FullscreenActivity extends AppCompatActivity {
     };
 
     Context _context;
-    //**private SpenSimpleSurfaceView _canvasView;
     UserCanvasView _canvasView;
 
     private int _tooltype;
@@ -170,7 +169,6 @@ public class FullscreenActivity extends AppCompatActivity {
                             }
 
                             enableEdit( false );
-                            _taskMode.diableEdit();
                         }
                         _i.i("_editButton : TaskMode = " + _taskMode.getString()) ;
                         hide( );
@@ -265,7 +263,10 @@ public class FullscreenActivity extends AppCompatActivity {
             return super.onOptionsItemSelected( item );
         }
     }
-    
+
+    /* fix pending : delete the argument 'mode' and
+        add a local var and set it to _taskMode.get( )
+     */
     void enableMenuOnMode( final int mode ) {
         if( mode == TaskMode.CREATE ) {
             _new_item.setEnabled( false ) ;
@@ -320,6 +321,7 @@ public class FullscreenActivity extends AppCompatActivity {
             _canvasView.setToolTypeAction( _tooltype,
                     SpenSimpleSurfaceView.ACTION_NONE );
             _editButton.setText("Edit");
+            _taskMode.diableEdit();
             //_editButton.setEnabled( true );
             _eraserButton.setEnabled ( false );
         }
